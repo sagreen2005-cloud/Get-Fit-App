@@ -339,7 +339,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <h2>Plan Setup</h2>
-        <p>These settings control the app title, the 9-week calendar, and the goal shown throughout the app. Changing the start date shifts the full workout schedule while keeping the same workout sequence.</p>
+        <p>These settings control the app title, 9-week calendar, goal, and profile-specific workout days. The start date controls when the 63-day plan begins; workouts then land on the weekdays selected below.</p>
         <div class="fieldgrid">
           <label>Plan Title
             <input id="settingPlanTitle" type="text" placeholder="Cancun 9-Week Fitness">
@@ -354,6 +354,21 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
             <input id="settingGoalDate" type="date">
           </label>
         </div>
+
+        <hr>
+        <h3 style="margin-top:0">Workout Days</h3>
+        <p class="small">Workout days are saved separately for each profile. The exercise order follows the selected days from earliest to latest in the week.</p>
+
+        <div class="card" style="margin:8px 0;background:var(--card2);box-shadow:none">
+          <h4>Scott • 4 days/week</h4>
+          <div id="scottWorkoutDays" class="checks"></div>
+        </div>
+
+        <div class="card" style="margin:8px 0;background:var(--card2);box-shadow:none">
+          <h4>Robyn • 3 days/week</h4>
+          <div id="robynWorkoutDays" class="checks"></div>
+        </div>
+
         <button class="btn" style="margin-top:12px" onclick="savePlanSettings()">Save Plan Settings</button>
         <button class="btn secondary" style="margin-top:12px;margin-left:5px" onclick="resetPlanSettings()">Restore Cancun Defaults</button>
       </div>
@@ -401,14 +416,32 @@ const DEFAULT_PLAN_SETTINGS = {
   title:'Cancun 9-Week Fitness',
   startDate:'2026-08-07',
   goalName:'Cancun',
-  goalDate:'2026-10-11'
+  goalDate:'2026-10-11',
+  workoutDays:{
+    Scott:[2,3,4,6],
+    Robyn:[1,3,5]
+  }
 };
 
 function getPlanSettings(){
   try{
-    return {...DEFAULT_PLAN_SETTINGS,...(JSON.parse(localStorage.getItem('cancunFitnessPlanSettings'))||{})};
+    const saved=JSON.parse(localStorage.getItem('cancunFitnessPlanSettings'))||{};
+    return {
+      ...DEFAULT_PLAN_SETTINGS,
+      ...saved,
+      workoutDays:{
+        Scott:Array.isArray(saved.workoutDays?.Scott) ? saved.workoutDays.Scott : [...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
+        Robyn:Array.isArray(saved.workoutDays?.Robyn) ? saved.workoutDays.Robyn : [...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
+      }
+    };
   }catch(e){
-    return {...DEFAULT_PLAN_SETTINGS};
+    return {
+      ...DEFAULT_PLAN_SETTINGS,
+      workoutDays:{
+        Scott:[...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
+        Robyn:[...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
+      }
+    };
   }
 }
 function savePlanSettingsObject(settings){
@@ -521,33 +554,37 @@ function saveData(d){ localStorage.setItem(storageKey(),JSON.stringify(d)); }
 function scheduledWorkout(person,d){
   const start=getPlanStart();
   const offset=Math.floor((d-start)/86400000);
-  const wk=Math.floor(offset/7)+1;
-  if(offset<0 || offset>=PLAN_DAYS || wk<1 || wk>9) return null;
-  const dayInWeek=((offset%7)+7)%7;
+  if(offset<0 || offset>=PLAN_DAYS) return null;
 
-  // The workout sequence is anchored to the chosen start date rather than
-  // fixed weekdays. This lets the same 9-week plan be reused at any future date.
+  const settings=getPlanSettings();
+  const selected=(settings.workoutDays?.[person] || DEFAULT_PLAN_SETTINGS.workoutDays[person] || [])
+    .map(Number)
+    .sort((a,b)=>a-b);
+
+  const weekday=d.getDay();
+  const slot=selected.indexOf(weekday);
+  if(slot===-1) return null;
+
+  // Exercise order follows the selected workout days from earliest to latest
+  // in the calendar week. This keeps the default schedule:
+  // Scott Tue Upper A, Wed Lower, Thu Upper B, Sat Full Body.
+  // Robyn Mon Full Body A, Wed Full Body B, Fri Full Body C.
   if(person==='Scott'){
-    if(wk===1){
-      if(dayInWeek===0) return {name:'Restart Full Body',template:workouts.Scott.full};
-      if(dayInWeek===1) return {name:'Full Body',template:workouts.Scott.full};
-      return null;
-    }
-    if(dayInWeek===1) return {name:'Full Body',template:workouts.Scott.full};
-    if(dayInWeek===4) return {name:'Upper A',template:workouts.Scott.upperA};
-    if(dayInWeek===5) return {name:'Lower',template:workouts.Scott.lower};
-    if(dayInWeek===6) return {name:'Upper B',template:workouts.Scott.upperB};
-    return null;
+    const sequence=[
+      {name:'Upper A',template:workouts.Scott.upperA},
+      {name:'Lower',template:workouts.Scott.lower},
+      {name:'Upper B',template:workouts.Scott.upperB},
+      {name:'Full Body',template:workouts.Scott.full}
+    ];
+    return sequence[Math.min(slot,sequence.length-1)] || null;
   }
 
-  if(wk===1){
-    if(dayInWeek===0) return {name:'Restart Full Body',template:workouts.Robyn.C};
-    return null;
-  }
-  if(dayInWeek===0) return {name:'Full Body C',template:workouts.Robyn.C};
-  if(dayInWeek===3) return {name:'Full Body A',template:workouts.Robyn.A};
-  if(dayInWeek===5) return {name:'Full Body B',template:workouts.Robyn.B};
-  return null;
+  const sequence=[
+    {name:'Full Body A',template:workouts.Robyn.A},
+    {name:'Full Body B',template:workouts.Robyn.B},
+    {name:'Full Body C',template:workouts.Robyn.C}
+  ];
+  return sequence[Math.min(slot,sequence.length-1)] || null;
 }
 function totalScheduled(){
   let n=0;
@@ -589,6 +626,44 @@ function applyPlanSettingsToUI(){
   // Home-screen metadata itself cannot be rewritten after installation,
   // but the visible app title and browser title update immediately.
 }
+
+const WEEKDAY_OPTIONS=[
+  {value:0,label:'Sun'},
+  {value:1,label:'Mon'},
+  {value:2,label:'Tue'},
+  {value:3,label:'Wed'},
+  {value:4,label:'Thu'},
+  {value:5,label:'Fri'},
+  {value:6,label:'Sat'}
+];
+
+function renderWorkoutDaySelectors(){
+  const settings=getPlanSettings();
+  renderWorkoutDaySelector('scottWorkoutDays','Scott',4,settings.workoutDays.Scott);
+  renderWorkoutDaySelector('robynWorkoutDays','Robyn',3,settings.workoutDays.Robyn);
+}
+function renderWorkoutDaySelector(containerId,person,requiredCount,selectedDays){
+  const box=document.getElementById(containerId);
+  if(!box) return;
+  box.innerHTML='';
+  WEEKDAY_OPTIONS.forEach(day=>{
+    const label=document.createElement('label');
+    label.style.minWidth='64px';
+    label.innerHTML=`<input type="checkbox" data-workout-person="${person}" value="${day.value}" ${selectedDays.includes(day.value)?'checked':''}> ${day.label}`;
+    box.appendChild(label);
+  });
+}
+function readWorkoutDays(person,requiredCount){
+  const values=[...document.querySelectorAll(`input[data-workout-person="${person}"]:checked`)]
+    .map(x=>Number(x.value))
+    .sort((a,b)=>a-b);
+  if(values.length!==requiredCount){
+    alert(`${person} must have exactly ${requiredCount} workout days selected.`);
+    return null;
+  }
+  return values;
+}
+
 function populatePlanSettingsForm(){
   const s=getPlanSettings();
   const a=document.getElementById('settingPlanTitle');
@@ -599,15 +674,26 @@ function populatePlanSettingsForm(){
   if(b) b.value=s.startDate||'';
   if(c) c.value=s.goalName||'';
   if(d) d.value=s.goalDate||'';
+  renderWorkoutDaySelectors();
 }
 function savePlanSettings(){
   const start=settingStartDate.value;
   if(!start) return alert('Choose a start date.');
+
+  const scottDays=readWorkoutDays('Scott',4);
+  if(!scottDays) return;
+  const robynDays=readWorkoutDays('Robyn',3);
+  if(!robynDays) return;
+
   const settings={
     title:settingPlanTitle.value.trim() || DEFAULT_PLAN_SETTINGS.title,
     startDate:start,
     goalName:settingGoalName.value.trim() || 'Goal',
-    goalDate:settingGoalDate.value || ''
+    goalDate:settingGoalDate.value || '',
+    workoutDays:{
+      Scott:scottDays,
+      Robyn:robynDays
+    }
   };
   savePlanSettingsObject(settings);
   applyPlanSettingsToUI();
@@ -618,7 +704,13 @@ function savePlanSettings(){
 }
 function resetPlanSettings(){
   if(!confirm('Restore the original Cancun plan title and dates?')) return;
-  savePlanSettingsObject({...DEFAULT_PLAN_SETTINGS});
+  savePlanSettingsObject({
+    ...DEFAULT_PLAN_SETTINGS,
+    workoutDays:{
+      Scott:[...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
+      Robyn:[...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
+    }
+  });
   populatePlanSettingsForm();
   applyPlanSettingsToUI();
   renderHome();
