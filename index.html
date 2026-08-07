@@ -217,11 +217,12 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <h3>Morning Check-In</h3>
-        <p class="small">Log your body weight and how your energy feels at the start of the day.</p>
+        <p class="small">Log your body weight, waist circumference, and how your energy feels at the start of the day.</p>
         <div class="fieldgrid">
           <label>Date<input id="dailyDate" type="date"></label>
-          <label>Body Weight (lb)<input id="dailyWeight" type="number" step="0.1"></label>
-          <label>Morning Energy (1–5)<input id="dailyEnergy" type="number" min="1" max="5"></label>
+          <label>Body Weight (lb)<input id="dailyWeight" type="number" inputmode="decimal" step="0.1"></label>
+          <label>Waist Circumference (in)<input id="dailyWaist" type="number" inputmode="decimal" step="0.1"></label>
+          <label>Morning Energy (1–5)<input id="dailyEnergy" type="number" inputmode="numeric" min="1" max="5"></label>
         </div>
         <div id="morningWorkoutPrompt" style="margin-top:10px"></div>
         <button class="btn" style="margin-top:12px" onclick="saveMorningCheckin()">Save Morning Check-In</button>
@@ -303,7 +304,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <button class="btn green" style="width:100%" onclick="saveWorkout()">Save Completed Workout</button>
-        <p class="small" style="margin-bottom:0">Body weight and energy are tracked in the Morning Check-In. Steps, water, and protein are tracked in the Evening Check-Out on Home.</p>
+        <p class="small" style="margin-bottom:0">Body weight, waist circumference, and energy are tracked in the Morning Check-In. Steps, water, and protein are tracked in the Evening Check-Out on Home.</p>
       </div>
 
     </section>
@@ -800,6 +801,7 @@ document.getElementById('eveningDate').addEventListener('change',e=>loadEveningF
 function loadMorningForDate(date){
   const x=loadData().daily?.[date]||{};
   dailyWeight.value=x.weight||'';
+  dailyWaist.value=x.waist||'';
   dailyEnergy.value=x.energy||'';
 }
 
@@ -833,6 +835,7 @@ function saveMorningCheckin(){
     ...existing,
     date,
     weight:dailyWeight.value ? Number(dailyWeight.value) : '',
+    waist:dailyWaist.value ? Number(dailyWaist.value) : '',
     energy:dailyEnergy.value ? Number(dailyEnergy.value) : '',
     morningSaved:true,
     morningSavedAt:new Date().toISOString()
