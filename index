@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#101319">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cancun Fitness">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<title>Cancun 9-Week Fitness</title>
+<style>
+:root{
+  --bg:#0e1116; --card:#171c24; --card2:#202733; --line:#303947;
+  --text:#f3f6fa; --muted:#aab4c1; --blue:#4da3ff; --green:#63d690;
+  --yellow:#f4c866; --red:#ff7373; --shadow:0 8px 24px rgba(0,0,0,.18);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-bottom:110px;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);min-height:100dvh;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  overscroll-behavior-y:none;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;font-size:16px}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.app{
+  max-width:900px;margin:0 auto;
+  padding:0 max(12px,env(safe-area-inset-right)) calc(108px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+}
+.top{
+  position:sticky;top:0;z-index:100;background:rgba(14,17,22,.96);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top)) 0 10px;
+}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand h1{font-size:20px;margin:0}
+.brand div{font-size:12px;color:var(--muted);margin-top:2px}
+select,input,textarea{
+  color:var(--text);background:#10151c;border:1px solid var(--line);
+  border-radius:11px;padding:10px;min-height:44px;
+  -webkit-appearance:none;appearance:none;
+}
+input[type="checkbox"]{-webkit-appearance:auto;appearance:auto}
+input[type="file"]{-webkit-appearance:auto;appearance:auto;padding:10px 6px}
+input[type="number"]{width:100%}
+input[type="checkbox"]{accent-color:var(--blue);width:18px;height:18px}
+textarea{resize:vertical}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px;margin:12px 0;box-shadow:var(--shadow);
+}
+h2{font-size:19px;margin:0 0 10px}
+h3{font-size:16px;margin:0 0 8px}
+h4{font-size:14px;margin:0 0 6px}
+p{line-height:1.45;color:var(--muted);margin:7px 0}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.btn{
+  border:0;border-radius:11px;padding:10px 13px;background:var(--blue);
+  color:white;font-weight:750;min-height:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+  -webkit-user-select:none;user-select:none;
+}
+.btn:active{transform:scale(.985);filter:brightness(.95)}
+.btn.secondary{background:var(--card2);border:1px solid var(--line);color:var(--text)}
+.btn.green{background:var(--green);color:#07150d}
+.btn.red{background:var(--red);color:#260909}
+.btn.tiny{padding:8px 10px;font-size:13px;min-height:44px}
+.pill{
+  display:inline-block;border:1px solid var(--line);background:var(--card2);
+  border-radius:999px;padding:5px 8px;font-size:12px;margin:2px;
+}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat{
+  background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:12px;
+}
+.stat .num{font-size:24px;font-weight:800;margin-top:4px}
+.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:200;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:5px;
+  background:#101319;border-top:1px solid var(--line);
+  padding:7px 8px calc(7px + env(safe-area-inset-bottom));
+}
+.tab{
+  border:0;border-radius:10px;background:transparent;color:var(--muted);
+  padding:9px 3px;font-size:12px;min-height:50px;touch-action:manipulation;
+}
+.tab.active{background:var(--card2);color:var(--text)}
+.view{display:none}
+.view.active{display:block}
+.week{margin:14px 0 20px}
+.weekhead{
+  position:sticky;top:63px;z-index:50;background:var(--bg);
+  padding:8px 2px 6px;border-bottom:1px solid var(--line)
+}
+.day{
+  display:grid;grid-template-columns:80px 1fr auto;gap:10px;align-items:center;
+  padding:10px;margin:7px 0;border:1px solid var(--line);
+  background:var(--card);border-radius:13px;
+}
+.day.today{outline:2px solid var(--blue)}
+.day.done{border-color:var(--green)}
+.daydate{font-size:12px;color:var(--muted)}
+.dayname{font-weight:800}
+.daydesc{font-size:12px;color:var(--muted);margin-top:2px}
+.rest{color:var(--muted);font-weight:650}
+.progressbar{height:9px;background:#0c1015;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.progressbar div{height:100%;background:var(--blue)}
+.fieldgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{font-size:12px;color:var(--muted)}
+.checks{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.checks label{display:flex;gap:6px;align-items:center;color:var(--text)}
+.timer{
+  font-size:36px;font-weight:850;letter-spacing:1px;text-align:center;
+  font-variant-numeric:tabular-nums;padding:6px 0;
+}
+.exercise{
+  border-top:1px solid var(--line);padding:12px 0;
+}
+.exercise:first-child{border-top:0}
+.exhead{display:flex;justify-content:space-between;gap:8px}
+.target{font-size:12px;color:var(--muted);white-space:nowrap}
+.previous{font-size:11px;color:var(--yellow);margin-top:3px}
+.setgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.setbox{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px}
+.setbox b{font-size:11px;color:var(--muted)}
+.setrow{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}
+.setrow input{min-width:0;padding:8px}
+.photoTools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photoTools input{grid-column:1/-1}
+.photoPick{display:block}
+.photoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photoCard{
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;
+}
+.photoCard img{
+  width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px;background:#07090c;
+}
+.compareGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.compareGrid img{
+  width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;background:#07090c;
+}
+.modal{
+  display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.9);
+  align-items:center;justify-content:center;padding:18px;
+}
+.modal.show{display:flex}
+.modal img{max-width:100%;max-height:88vh;border-radius:12px}
+.modal button{position:absolute;top:14px;right:14px}
+.notice{font-size:12px;color:var(--muted);padding:10px;background:var(--card2);border-radius:10px}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+@media(max-width:650px){
+  .brand h1{font-size:18px}
+  .brand div{font-size:11px}
+  #profileSelect{max-width:115px}
+  .fieldgrid{grid-template-columns:repeat(2,1fr)}
+  .day{grid-template-columns:64px 1fr auto;gap:7px;padding:9px}
+  .photoGrid{grid-template-columns:repeat(2,1fr)}
+  .setgrid{gap:5px}
+  .setbox{padding:6px}
+  .card{padding:13px}
+}
+@media(display-mode:standalone){
+  body{background:#101319}
+}
+@supports (-webkit-touch-callout:none){
+  .weekhead{top:calc(63px + env(safe-area-inset-top))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="topline">
+      <div class="brand">
+        <h1 id="appHeaderTitle">Cancun 9-Week Fitness</h1>
+        <div id="appHeaderSubtitle">August 7 – October 8, 2026 • Cancun October 11</div>
+      </div>
+      <select id="profileSelect" aria-label="Profile">
+        <option value="Scott">Scott</option>
+        <option value="Robyn">Robyn</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <section id="homeView" class="view active">
+      <div class="card">
+        <div class="row between">
+          <div>
+            <h2 id="homeName">Today</h2>
+            <div id="homeDate" class="muted small"></div>
+          </div>
+          <span id="todayBadge" class="pill">Plan</span>
+        </div>
+        <div id="todayCard" style="margin-top:10px"></div>
+      </div>
+
+      <div class="grid2">
+        <div class="stat"><div class="muted small">Latest Weight</div><div id="latestWeight" class="num">—</div></div>
+        <div class="stat"><div class="muted small">Latest Steps</div><div id="latestSteps" class="num">—</div></div>
+        <div class="stat"><div class="muted small">Workouts Done</div><div id="workoutsDone" class="num">0</div></div>
+        <div class="stat"><div class="muted small">Plan Complete</div><div id="planPercent" class="num">0%</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Daily Check-In</h3>
+        <div class="fieldgrid">
+          <label>Date<input id="dailyDate" type="date"></label>
+          <label>Body Weight (lb)<input id="dailyWeight" type="number" step="0.1"></label>
+          <label>Steps<input id="dailySteps" type="number" step="1"></label>
+          <label>Energy (1–5)<input id="dailyEnergy" type="number" min="1" max="5"></label>
+        </div>
+        <div class="checks">
+          <label><input id="dailyWater" type="checkbox"> Water goal met</label>
+          <label><input id="dailyProtein" type="checkbox"> Protein goal met</label>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="saveDailyCheckin()">Save Check-In</button>
+      </div>
+
+      <div class="card">
+        <h3>Current Targets</h3>
+        <div id="nutritionTargets"></div>
+      </div>
+    </section>
+
+    <section id="planView" class="view">
+      <div class="card">
+        <div class="row between">
+          <div>
+            <h2>9-Week Plan</h2>
+            <p class="small">Every day is listed. Workout days open the exercise tracker; recovery days can still be used for your daily check-in.</p>
+          </div>
+          <button class="btn secondary tiny" onclick="scrollToToday()">Today</button>
+        </div>
+        <div class="progressbar"><div id="planBar" style="width:0%"></div></div>
+      </div>
+      <div id="planTimeline"></div>
+    </section>
+
+    <section id="workoutView" class="view">
+      <div class="card">
+        <div class="row between">
+          <div>
+            <h2 id="workoutName">Workout</h2>
+            <div id="workoutDateText" class="muted small"></div>
+          </div>
+          <button class="btn secondary tiny" onclick="showView('plan')">Plan</button>
+        </div>
+        <div id="workoutTimer" class="timer">00:00:00</div>
+        <div class="row" style="justify-content:center">
+          <button id="workoutTimerBtn" class="btn tiny" onclick="toggleWorkoutTimer()">Start</button>
+          <button class="btn secondary tiny" onclick="resetWorkoutTimer()">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Exercises</h3>
+        <div id="exerciseList"></div>
+      </div>
+
+      <div class="card">
+        <h3>Rest Timer</h3>
+        <div id="restTimer" class="timer">01:30</div>
+        <div class="row" style="justify-content:center">
+          <button class="btn tiny" onclick="startRestTimer(60)">1:00</button>
+          <button class="btn tiny" onclick="startRestTimer(90)">1:30</button>
+          <button class="btn tiny" onclick="startRestTimer(120)">2:00</button>
+          <button class="btn secondary tiny" onclick="stopRestTimer()">Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Workout Check-In</h3>
+        <div class="fieldgrid">
+          <label>Body Weight (lb)<input id="woWeight" type="number" step="0.1"></label>
+          <label>Steps<input id="woSteps" type="number"></label>
+          <label>Energy (1–5)<input id="woEnergy" type="number" min="1" max="5"></label>
+        </div>
+        <div class="checks">
+          <label><input id="woWater" type="checkbox"> Water goal met</label>
+          <label><input id="woProtein" type="checkbox"> Protein goal met</label>
+        </div>
+        <label style="display:block;margin-top:10px">Notes<textarea id="woNotes" rows="3" style="width:100%"></textarea></label>
+        <button class="btn green" style="margin-top:12px" onclick="saveWorkout()">Save Completed Workout</button>
+      </div>
+    </section>
+
+    <section id="photosView" class="view">
+      <div class="card">
+        <h2>Progress Photos</h2>
+        <div class="notice">
+          Choose an image from the iPhone Photos picker. The app stores an optimized local copy in IndexedDB;
+          nothing is uploaded to Firebase or another server. Your original photo stays in the Photos app.
+        </div>
+        <div class="photoTools" style="margin-top:10px">
+          <input id="photoFile" type="file" accept="image/*">
+          <select id="photoWeek"></select>
+          <select id="photoPose">
+            <option value="Front">Front</option>
+            <option value="Side">Side</option>
+            <option value="Back">Back</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <button class="btn" style="margin-top:10px" onclick="saveProgressPhoto()">Save Photo</button>
+      </div>
+
+      <div class="card">
+        <h3>Side-by-Side</h3>
+        <div class="row">
+          <select id="compareLeft" style="flex:1"></select>
+          <select id="compareRight" style="flex:1"></select>
+        </div>
+        <div id="compareArea" class="compareGrid" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Gallery</h3>
+        <div id="photoGallery" class="photoGrid"></div>
+      </div>
+    </section>
+
+    <section id="settingsView" class="view">
+      <div class="card">
+        <h2>iPhone Home Screen</h2>
+        <p id="installStatus">Checking display mode…</p>
+        <div class="notice">
+          In Chrome on iPhone: open the hosted app → tap <b>Share</b> → <b>Add to Home Screen</b>.
+          When iOS offers it, keep <b>Open as Web App</b> enabled. Use the Home Screen icon for your normal workouts.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Plan Setup</h2>
+        <p>These settings control the app title, the 9-week calendar, and the goal shown throughout the app. Changing the start date shifts the full workout schedule while keeping the same workout sequence.</p>
+        <div class="fieldgrid">
+          <label>Plan Title
+            <input id="settingPlanTitle" type="text" placeholder="Cancun 9-Week Fitness">
+          </label>
+          <label>Start Date
+            <input id="settingStartDate" type="date">
+          </label>
+          <label>Goal / Event
+            <input id="settingGoalName" type="text" placeholder="Cancun">
+          </label>
+          <label>Goal Date
+            <input id="settingGoalDate" type="date">
+          </label>
+        </div>
+        <button class="btn" style="margin-top:12px" onclick="savePlanSettings()">Save Plan Settings</button>
+        <button class="btn secondary" style="margin-top:12px;margin-left:5px" onclick="resetPlanSettings()">Restore Cancun Defaults</button>
+      </div>
+
+      <div class="card">
+        <h2>Storage & Backup</h2>
+        <p>Workout logs, daily check-ins and preferences are stored only in this browser. Photos are stored only in this browser's IndexedDB database. There is no Firebase code or network sync in this file.</p>
+        <button class="btn" onclick="exportProfileData()">Export Workout Data</button>
+        <label class="btn secondary" style="display:inline-block;margin-left:5px">
+          Import Workout Data
+          <input id="importDataFile" type="file" accept=".json,application/json" style="display:none" onchange="importProfileData(event)">
+        </label>
+        <hr>
+        <button class="btn red" onclick="resetCurrentProfile()">Reset Current Profile Data</button>
+      </div>
+
+      <div class="card">
+        <h3>How progress works</h3>
+        <p id="progressAdvice"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-view="home" onclick="showView('home')">Home</button>
+  <button class="tab" data-view="plan" onclick="showView('plan')">Plan</button>
+  <button class="tab" data-view="workout" onclick="showView('workout')">Workout</button>
+  <button class="tab" data-view="photos" onclick="showView('photos')">Photos</button>
+  <button class="tab" data-view="settings" onclick="showView('settings')">Settings</button>
+</nav>
+
+<div id="photoModal" class="modal" onclick="closePhotoModal()">
+  <button class="btn secondary">Close</button>
+  <img id="modalImage" alt="Progress photo">
+</div>
+
+<script>
+'use strict';
+
+const PLAN_DAYS = 63;
+const TOTAL_WEEKS = 9;
+
+const DEFAULT_PLAN_SETTINGS = {
+  title:'Cancun 9-Week Fitness',
+  startDate:'2026-08-07',
+  goalName:'Cancun',
+  goalDate:'2026-10-11'
+};
+
+function getPlanSettings(){
+  try{
+    return {...DEFAULT_PLAN_SETTINGS,...(JSON.parse(localStorage.getItem('cancunFitnessPlanSettings'))||{})};
+  }catch(e){
+    return {...DEFAULT_PLAN_SETTINGS};
+  }
+}
+function savePlanSettingsObject(settings){
+  localStorage.setItem('cancunFitnessPlanSettings',JSON.stringify(settings));
+}
+function getPlanStart(){
+  const s=getPlanSettings();
+  return new Date(s.startDate+'T12:00:00');
+}
+let profile = localStorage.getItem('cancunFitnessProfile') || 'Scott';
+let activeWorkout = null;
+let workoutElapsed = 0;
+let workoutTimerHandle = null;
+let restTimerHandle = null;
+
+const targets = {
+  Scott:{
+    calories:'2,200–2,300/day',
+    protein:'200–220 g/day',
+    water:'3–4 L/day',
+    steps:'8,000–10,000/day',
+    advice:'Continue steady fat loss while protecting muscle. Use protein, lifting and consistent calories rather than aggressive under-eating on tirzepatide.'
+  },
+  Robyn:{
+    calories:'1,700–1,850/day',
+    protein:'140–160 g/day',
+    water:'80–100 oz/day',
+    steps:'7,500–9,000/day',
+    advice:'Use a two-week trend before cutting calories further. With lifting and positive TRT response, waist measurements, photos and strength may improve even when scale loss is slower.'
+  }
+};
+
+const workouts = {
+  Scott:{
+    upperA:{
+      name:'Upper A',
+      exercises:[
+        ['Bench Press','3 x 6–12'],['Seated / Cable Row','3 x 8–12'],['Shoulder Press','3 x 8–12'],
+        ['Lat Pulldown','3 x 8–12'],['Biceps Curl','3 x 10–15'],['Triceps Pressdown','3 x 10–15']
+      ]
+    },
+    lower:{
+      name:'Lower',
+      exercises:[
+        ['Squat or Leg Press','3 x 6–12'],['Romanian Deadlift','3 x 8–12'],['Walking Lunges','3 x 8–12/leg'],
+        ['Leg Curl','3 x 10–15'],['Calf Raise','3 x 10–15'],['Ab Exercise','3 sets']
+      ]
+    },
+    upperB:{
+      name:'Upper B',
+      exercises:[
+        ['Incline Press','3 x 6–12'],['Lat Pulldown / Pull-Up','3 x 8–12'],['Cable / Seated Row','3 x 8–12'],
+        ['Lateral Raise','3 x 10–15'],['Biceps Curl','3 x 10–15'],['Triceps Extension','3 x 10–15']
+      ]
+    },
+    full:{
+      name:'Full Body',
+      exercises:[
+        ['Squat or Leg Press','3 x 8–12'],['Bench / Chest Press','3 x 8–12'],['Row','3 x 8–12'],
+        ['Romanian Deadlift','3 x 8–12'],['Lateral Raise','3 x 10–15'],['Biceps + Triceps','3 x 10–15 each']
+      ]
+    }
+  },
+  Robyn:{
+    A:{
+      name:'Full Body A',
+      exercises:[
+        ['Squat or Leg Press','3 x 8–12'],['Romanian Deadlift','3 x 8–12'],['Chest Press','3 x 8–12'],
+        ['Lat Pulldown','3 x 8–12'],['Lateral Raise','3 x 10–15'],['Plank','3 sets']
+      ]
+    },
+    B:{
+      name:'Full Body B',
+      exercises:[
+        ['Hip Thrust','3 x 8–12'],['Walking Lunges','3 x 8–12/leg'],['Seated Row','3 x 8–12'],
+        ['Incline Dumbbell Press','3 x 8–12'],['Shoulder Press','3 x 8–12'],['Cable Crunch','3 sets']
+      ]
+    },
+    C:{
+      name:'Full Body C',
+      exercises:[
+        ['Goblet Squat / Leg Press','3 x 8–12'],['Romanian Deadlift','3 x 8–12'],['Lat Pulldown','3 x 8–12'],
+        ['Chest Press','3 x 8–12'],['Hip Thrust / Glute Movement','3 x 10–15'],['Biceps + Triceps','3 x 10–15 each']
+      ]
+    }
+  }
+};
+
+function isoDate(d){ return d.toISOString().slice(0,10); }
+function planDate(offset){
+  const d = getPlanStart();
+  d.setDate(d.getDate()+offset);
+  return d;
+}
+function niceDate(d){
+  return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+}
+function weekNumber(d){
+  return Math.floor((d-getPlanStart())/86400000/7)+1;
+}
+function storageKey(){ return 'cancunFitnessData_'+profile; }
+function loadData(){
+  try{
+    const x = JSON.parse(localStorage.getItem(storageKey()));
+    return x || {daily:{},workouts:{}};
+  }catch(e){ return {daily:{},workouts:{}}; }
+}
+function saveData(d){ localStorage.setItem(storageKey(),JSON.stringify(d)); }
+
+function scheduledWorkout(person,d){
+  const start=getPlanStart();
+  const offset=Math.floor((d-start)/86400000);
+  const wk=Math.floor(offset/7)+1;
+  if(offset<0 || offset>=PLAN_DAYS || wk<1 || wk>9) return null;
+  const dayInWeek=((offset%7)+7)%7;
+
+  // The workout sequence is anchored to the chosen start date rather than
+  // fixed weekdays. This lets the same 9-week plan be reused at any future date.
+  if(person==='Scott'){
+    if(wk===1){
+      if(dayInWeek===0) return {name:'Restart Full Body',template:workouts.Scott.full};
+      if(dayInWeek===1) return {name:'Full Body',template:workouts.Scott.full};
+      return null;
+    }
+    if(dayInWeek===1) return {name:'Full Body',template:workouts.Scott.full};
+    if(dayInWeek===4) return {name:'Upper A',template:workouts.Scott.upperA};
+    if(dayInWeek===5) return {name:'Lower',template:workouts.Scott.lower};
+    if(dayInWeek===6) return {name:'Upper B',template:workouts.Scott.upperB};
+    return null;
+  }
+
+  if(wk===1){
+    if(dayInWeek===0) return {name:'Restart Full Body',template:workouts.Robyn.C};
+    return null;
+  }
+  if(dayInWeek===0) return {name:'Full Body C',template:workouts.Robyn.C};
+  if(dayInWeek===3) return {name:'Full Body A',template:workouts.Robyn.A};
+  if(dayInWeek===5) return {name:'Full Body B',template:workouts.Robyn.B};
+  return null;
+}
+function totalScheduled(){
+  let n=0;
+  for(let i=0;i<PLAN_DAYS;i++) if(scheduledWorkout(profile,planDate(i))) n++;
+  return n;
+}
+
+
+function formatLongDate(dateStr){
+  if(!dateStr) return '';
+  return new Date(dateStr+'T12:00:00').toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
+}
+function formatShortDateObj(d){
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+}
+function planEndDate(){
+  return planDate(PLAN_DAYS-1);
+}
+function applyPlanSettingsToUI(){
+  const s=getPlanSettings();
+  const title=s.title?.trim() || DEFAULT_PLAN_SETTINGS.title;
+  const goal=s.goalName?.trim() || 'Goal';
+  const goalDateText=s.goalDate ? formatLongDate(s.goalDate) : '';
+  const start=getPlanStart();
+  const end=planEndDate();
+
+  document.title=title;
+  const headerTitle=document.getElementById('appHeaderTitle');
+  const headerSubtitle=document.getElementById('appHeaderSubtitle');
+  if(headerTitle) headerTitle.textContent=title;
+  if(headerSubtitle){
+    headerSubtitle.textContent=`${formatShortDateObj(start)} – ${formatShortDateObj(end)} • ${goal}${goalDateText ? ' '+goalDateText : ''}`;
+  }
+
+  const planHeading=document.querySelector('#planView h2');
+  if(planHeading) planHeading.textContent=`9-Week Plan • ${goal}`;
+
+  const installTitle=document.querySelector('#settingsView h2');
+  // Home-screen metadata itself cannot be rewritten after installation,
+  // but the visible app title and browser title update immediately.
+}
+function populatePlanSettingsForm(){
+  const s=getPlanSettings();
+  const a=document.getElementById('settingPlanTitle');
+  const b=document.getElementById('settingStartDate');
+  const c=document.getElementById('settingGoalName');
+  const d=document.getElementById('settingGoalDate');
+  if(a) a.value=s.title||'';
+  if(b) b.value=s.startDate||'';
+  if(c) c.value=s.goalName||'';
+  if(d) d.value=s.goalDate||'';
+}
+function savePlanSettings(){
+  const start=settingStartDate.value;
+  if(!start) return alert('Choose a start date.');
+  const settings={
+    title:settingPlanTitle.value.trim() || DEFAULT_PLAN_SETTINGS.title,
+    startDate:start,
+    goalName:settingGoalName.value.trim() || 'Goal',
+    goalDate:settingGoalDate.value || ''
+  };
+  savePlanSettingsObject(settings);
+  applyPlanSettingsToUI();
+  renderHome();
+  renderPlan();
+  renderSettings();
+  alert('Plan settings saved. The 9-week schedule has been updated.');
+}
+function resetPlanSettings(){
+  if(!confirm('Restore the original Cancun plan title and dates?')) return;
+  savePlanSettingsObject({...DEFAULT_PLAN_SETTINGS});
+  populatePlanSettingsForm();
+  applyPlanSettingsToUI();
+  renderHome();
+  renderPlan();
+  renderSettings();
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name+'View').classList.add('active');
+  document.querySelector(`.tab[data-view="${name}"]`).classList.add('active');
+
+  if(name==='home') renderHome();
+  if(name==='plan') renderPlan();
+  if(name==='photos') renderPhotos();
+  if(name==='settings') renderSettings();
+}
+
+function renderHome(){
+  const now = new Date();
+  const d = loadData();
+  const ps=getPlanSettings();
+  document.getElementById('homeName').textContent = profile + ' — Today';
+  document.getElementById('homeDate').textContent =
+    `${niceDate(now)} • ${ps.goalName || 'Goal'}${ps.goalDate ? ' '+formatLongDate(ps.goalDate) : ''}`;
+  document.getElementById('dailyDate').value = isoDate(now);
+
+  const p = scheduledWorkout(profile,now);
+  const today = document.getElementById('todayCard');
+  if(p){
+    today.innerHTML = `<h3>${p.name}</h3><p>${p.template.exercises.length} exercises scheduled today.</p>
+      <button class="btn" onclick="openWorkout('${isoDate(now)}')">Open Workout</button>`;
+    document.getElementById('todayBadge').textContent='Workout Day';
+  }else{
+    today.innerHTML = `<h3>Recovery / Activity Day</h3><p>Hit your steps, hydration and nutrition targets. Use the daily check-in below.</p>`;
+    document.getElementById('todayBadge').textContent='Recovery';
+  }
+
+  const daily = Object.values(d.daily||{}).sort((a,b)=>a.date.localeCompare(b.date));
+  const latest = daily[daily.length-1];
+  document.getElementById('latestWeight').textContent = latest?.weight ? latest.weight+' lb' : '—';
+  document.getElementById('latestSteps').textContent = latest?.steps ? Number(latest.steps).toLocaleString() : '—';
+
+  const done = Object.values(d.workouts||{}).filter(x=>x.completed).length;
+  document.getElementById('workoutsDone').textContent = done;
+  const pct = Math.round((done/totalScheduled())*100)||0;
+  document.getElementById('planPercent').textContent = pct+'%';
+
+  const t=targets[profile];
+  document.getElementById('nutritionTargets').innerHTML =
+    `<span class="pill">Calories ${t.calories}</span>
+     <span class="pill">Protein ${t.protein}</span>
+     <span class="pill">Water ${t.water}</span>
+     <span class="pill">Steps ${t.steps}</span>
+     <p>${t.advice}</p>`;
+
+  loadCheckinForDate(document.getElementById('dailyDate').value);
+}
+
+document.getElementById('dailyDate').addEventListener('change',e=>loadCheckinForDate(e.target.value));
+function loadCheckinForDate(date){
+  const x=loadData().daily?.[date]||{};
+  dailyWeight.value=x.weight||'';
+  dailySteps.value=x.steps||'';
+  dailyEnergy.value=x.energy||'';
+  dailyWater.checked=!!x.water;
+  dailyProtein.checked=!!x.protein;
+}
+function saveDailyCheckin(){
+  const date=dailyDate.value;
+  if(!date) return alert('Choose a date.');
+  const d=loadData();
+  d.daily[date]={
+    date,
+    weight:dailyWeight.value ? Number(dailyWeight.value) : '',
+    steps:dailySteps.value ? Number(dailySteps.value) : '',
+    energy:dailyEnergy.value ? Number(dailyEnergy.value) : '',
+    water:dailyWater.checked,
+    protein:dailyProtein.checked
+  };
+  saveData(d);
+  renderHome();
+  alert('Saved on this device.');
+}
+
+function renderPlan(){
+  const wrap=document.getElementById('planTimeline');
+  const d=loadData();
+  wrap.innerHTML='';
+  let completed=0;
+  Object.values(d.workouts||{}).forEach(x=>{if(x.completed)completed++});
+  document.getElementById('planBar').style.width=((completed/totalScheduled())*100||0)+'%';
+
+  for(let w=1;w<=9;w++){
+    const section=document.createElement('div');
+    section.className='week';
+    section.id='week-'+w;
+    const start=planDate((w-1)*7), end=planDate((w-1)*7+6);
+    section.innerHTML=`<div class="weekhead"><h3>Week ${w}</h3><div class="small muted">${niceDate(start)} – ${niceDate(end)}</div></div>`;
+    for(let i=0;i<7;i++){
+      const dt=planDate((w-1)*7+i);
+      const date=isoDate(dt);
+      const p=scheduledWorkout(profile,dt);
+      const log=d.workouts?.[date];
+      const item=document.createElement('div');
+      item.className='day'+(date===isoDate(new Date())?' today':'')+(log?.completed?' done':'');
+      item.dataset.date=date;
+      if(p){
+        item.innerHTML=`
+          <div class="daydate">${niceDate(dt)}</div>
+          <div><div class="dayname">${p.name}</div><div class="daydesc">${p.template.exercises.length} exercises${log?.completed?' • Completed':''}</div></div>
+          <button class="btn tiny ${log?.completed?'secondary':''}" onclick="openWorkout('${date}')">${log?.completed?'Review':'Open'}</button>`;
+      }else{
+        const check=d.daily?.[date];
+        item.innerHTML=`
+          <div class="daydate">${niceDate(dt)}</div>
+          <div><div class="rest">Recovery / Activity</div><div class="daydesc">${check?'Check-in saved':'Steps • water • protein • recovery'}</div></div>
+          <button class="btn secondary tiny" onclick="openDayCheckin('${date}')">${check?'Review':'Check-In'}</button>`;
+      }
+      section.appendChild(item);
+    }
+    wrap.appendChild(section);
+  }
+}
+
+function openDayCheckin(date){
+  showView('home');
+  dailyDate.value=date;
+  loadCheckinForDate(date);
+  window.scrollTo({top:document.querySelector('#homeView .card:nth-of-type(2)').offsetTop-70,behavior:'smooth'});
+}
+function scrollToToday(){
+  const today=isoDate(new Date());
+  const el=document.querySelector(`.day[data-date="${today}"]`);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
+  else document.getElementById('week-1').scrollIntoView({behavior:'smooth'});
+}
+
+function findPreviousExercise(exerciseName,currentDate){
+  const d=loadData();
+  const dates=Object.keys(d.workouts||{}).filter(x=>x<currentDate).sort().reverse();
+  for(const date of dates){
+    const wo=d.workouts[date];
+    const found=(wo.exercises||[]).find(x=>x.name===exerciseName);
+    if(found){
+      const text=(found.sets||[]).map((s,i)=>`S${i+1}: ${s.weight||'—'} × ${s.reps||'—'}`).join(' | ');
+      return text;
+    }
+  }
+  return '';
+}
+
+function openWorkout(date){
+  const dt=new Date(date+'T12:00:00');
+  const p=scheduledWorkout(profile,dt);
+  if(!p) return alert('No workout is scheduled for this date.');
+  const existing=loadData().workouts?.[date]||{};
+  activeWorkout={date,plan:p};
+
+  workoutName.textContent=p.name;
+  workoutDateText.textContent=`${profile} • ${niceDate(dt)} • Week ${weekNumber(dt)}`;
+  exerciseList.innerHTML='';
+
+  p.template.exercises.forEach((ex,i)=>{
+    const prior=findPreviousExercise(ex[0],date);
+    const savedEx=(existing.exercises||[])[i]||{};
+    const sets=savedEx.sets||[];
+    const div=document.createElement('div');
+    div.className='exercise';
+    div.innerHTML=`
+      <div class="exhead">
+        <div><strong>${ex[0]}</strong><div class="previous">${prior ? 'Previous: '+prior : 'No previous entry'}</div></div>
+        <div class="target">${ex[1]}</div>
+      </div>
+      <div class="setgrid">
+        ${[0,1,2].map(s=>`
+          <div class="setbox">
+            <b>SET ${s+1}</b>
+            <div class="setrow">
+              <input id="w_${i}_${s}" type="number" step="0.5" placeholder="Wt" value="${sets[s]?.weight ?? ''}">
+              <input id="r_${i}_${s}" type="number" step="1" placeholder="Reps" value="${sets[s]?.reps ?? ''}">
+            </div>
+          </div>`).join('')}
+      </div>`;
+    exerciseList.appendChild(div);
+  });
+
+  woWeight.value=existing.weight||'';
+  woSteps.value=existing.steps||'';
+  woEnergy.value=existing.energy||'';
+  woWater.checked=!!existing.water;
+  woProtein.checked=!!existing.protein;
+  woNotes.value=existing.notes||'';
+  workoutElapsed=existing.duration||0;
+  renderWorkoutTimer();
+  showView('workout');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function saveWorkout(){
+  if(!activeWorkout) return alert('Open a workout from the Plan first.');
+  const d=loadData();
+  const exercises=activeWorkout.plan.template.exercises.map((ex,i)=>({
+    name:ex[0],
+    target:ex[1],
+    sets:[0,1,2].map(s=>({
+      weight:document.getElementById(`w_${i}_${s}`).value ? Number(document.getElementById(`w_${i}_${s}`).value) : '',
+      reps:document.getElementById(`r_${i}_${s}`).value ? Number(document.getElementById(`r_${i}_${s}`).value) : ''
+    }))
+  }));
+  d.workouts[activeWorkout.date]={
+    date:activeWorkout.date,
+    name:activeWorkout.plan.name,
+    exercises,
+    weight:woWeight.value ? Number(woWeight.value) : '',
+    steps:woSteps.value ? Number(woSteps.value) : '',
+    energy:woEnergy.value ? Number(woEnergy.value) : '',
+    water:woWater.checked,
+    protein:woProtein.checked,
+    notes:woNotes.value,
+    duration:workoutElapsed,
+    completed:true,
+    savedAt:new Date().toISOString()
+  };
+  d.daily[activeWorkout.date]={
+    date:activeWorkout.date,
+    weight:woWeight.value ? Number(woWeight.value) : '',
+    steps:woSteps.value ? Number(woSteps.value) : '',
+    energy:woEnergy.value ? Number(woEnergy.value) : '',
+    water:woWater.checked,
+    protein:woProtein.checked
+  };
+  saveData(d);
+  stopWorkoutTimer();
+  alert('Workout saved on this device.');
+  renderPlan();
+}
+
+function formatDuration(seconds){
+  const h=Math.floor(seconds/3600);
+  const m=Math.floor((seconds%3600)/60);
+  const s=seconds%60;
+  return [h,m,s].map(x=>String(x).padStart(2,'0')).join(':');
+}
+function renderWorkoutTimer(){ workoutTimer.textContent=formatDuration(workoutElapsed); }
+function toggleWorkoutTimer(){
+  if(workoutTimerHandle){ stopWorkoutTimer(); return; }
+  workoutTimerBtn.textContent='Pause';
+  workoutTimerHandle=setInterval(()=>{workoutElapsed++;renderWorkoutTimer()},1000);
+}
+function stopWorkoutTimer(){
+  if(workoutTimerHandle){clearInterval(workoutTimerHandle);workoutTimerHandle=null}
+  workoutTimerBtn.textContent='Start';
+}
+function resetWorkoutTimer(){
+  if(confirm('Reset the workout timer?')){
+    stopWorkoutTimer();workoutElapsed=0;renderWorkoutTimer();
+  }
+}
+function startRestTimer(seconds){
+  stopRestTimer();
+  let left=seconds;
+  const draw=()=>{
+    const m=Math.floor(left/60),s=left%60;
+    restTimer.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  };
+  draw();
+  restTimerHandle=setInterval(()=>{
+    left--; draw();
+    if(left<=0){
+      stopRestTimer();
+      if(navigator.vibrate) navigator.vibrate([250,120,250]);
+    }
+  },1000);
+}
+function stopRestTimer(){
+  if(restTimerHandle){clearInterval(restTimerHandle);restTimerHandle=null}
+}
+
+function photoDb(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open('CancunFitnessPhotos',1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains('photos')){
+        const store=db.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+        store.createIndex('profile','profile',{unique:false});
+      }
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function getPhotos(){
+  const db=await photoDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction('photos','readonly');
+    const req=tx.objectStore('photos').getAll();
+    req.onsuccess=()=>resolve(req.result.filter(x=>x.profile===profile).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)));
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function optimizePhoto(file){
+  // Progress photos do not need full iPhone camera resolution. Reducing them
+  // makes week-to-week galleries faster and uses much less local device storage.
+  try{
+    const objectURL=URL.createObjectURL(file);
+    const img=await new Promise((resolve,reject)=>{
+      const im=new Image();
+      im.onload=()=>resolve(im);
+      im.onerror=reject;
+      im.src=objectURL;
+    });
+    const maxSide=1800;
+    let w=img.naturalWidth, h=img.naturalHeight;
+    const scale=Math.min(1,maxSide/Math.max(w,h));
+    w=Math.round(w*scale); h=Math.round(h*scale);
+    const canvas=document.createElement('canvas');
+    canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(objectURL);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86));
+    return blob || file;
+  }catch(e){
+    return file;
+  }
+}
+
+async function saveProgressPhoto(){
+  const file=photoFile.files[0];
+  if(!file) return alert('Choose a photo from your iPhone Photos library first.');
+  const week=Number(photoWeek.value);
+  const pose=photoPose.value;
+  const localBlob=await optimizePhoto(file);
+  const db=await photoDb();
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction('photos','readwrite');
+    tx.objectStore('photos').add({
+      profile,week,pose,blob:localBlob,createdAt:new Date().toISOString()
+    });
+    tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error);
+  });
+  photoFile.value='';
+  await renderPhotos();
+  alert('Photo saved locally on this iPhone.');
+}
+async function deletePhoto(id){
+  if(!confirm('Delete this photo from this device?')) return;
+  const db=await photoDb();
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction('photos','readwrite');
+    tx.objectStore('photos').delete(id);
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+  });
+  renderPhotos();
+}
+function photoLabel(p){ return `Week ${p.week} • ${p.pose}`; }
+function urlFor(blob){ return URL.createObjectURL(blob); }
+
+async function renderPhotos(){
+  photoWeek.innerHTML='';
+  for(let i=1;i<=9;i++){
+    const o=document.createElement('option');o.value=i;o.textContent='Week '+i;photoWeek.appendChild(o);
+  }
+  const currentWeek=weekNumber(new Date());
+  photoWeek.value=(currentWeek>=1&&currentWeek<=9)?currentWeek:1;
+
+  const photos=await getPhotos();
+  photoGallery.innerHTML='';
+  if(!photos.length) photoGallery.innerHTML='<p class="small">No photos saved yet.</p>';
+  photos.slice().reverse().forEach(p=>{
+    const u=urlFor(p.blob);
+    const c=document.createElement('div');c.className='photoCard';
+    c.innerHTML=`<img src="${u}" alt="${photoLabel(p)}" onclick="openPhotoModal('${u}')">
+      <div class="small" style="margin-top:5px"><b>${photoLabel(p)}</b></div>
+      <button class="btn red tiny" style="margin-top:6px" onclick="deletePhoto(${p.id})">Delete</button>`;
+    photoGallery.appendChild(c);
+  });
+
+  compareLeft.innerHTML='';compareRight.innerHTML='';
+  if(!photos.length){
+    compareLeft.innerHTML='<option>No photos</option>';
+    compareRight.innerHTML='<option>No photos</option>';
+    compareArea.innerHTML='';
+    return;
+  }
+  photos.forEach(p=>{
+    [compareLeft,compareRight].forEach(sel=>{
+      const o=document.createElement('option');o.value=p.id;o.textContent=photoLabel(p);sel.appendChild(o);
+    });
+  });
+  compareLeft.value=photos[0].id;
+  compareRight.value=photos[photos.length-1].id;
+  compareLeft.onchange=renderComparison;
+  compareRight.onchange=renderComparison;
+  renderComparison();
+}
+async function renderComparison(){
+  const photos=await getPhotos();
+  const a=photos.find(x=>String(x.id)===String(compareLeft.value));
+  const b=photos.find(x=>String(x.id)===String(compareRight.value));
+  if(!a||!b){compareArea.innerHTML='';return}
+  const ua=urlFor(a.blob), ub=urlFor(b.blob);
+  compareArea.innerHTML=`
+    <div><img src="${ua}" onclick="openPhotoModal('${ua}')"><div class="small">${photoLabel(a)}</div></div>
+    <div><img src="${ub}" onclick="openPhotoModal('${ub}')"><div class="small">${photoLabel(b)}</div></div>`;
+}
+function openPhotoModal(src){
+  modalImage.src=src;photoModal.classList.add('show');
+}
+function closePhotoModal(){photoModal.classList.remove('show')}
+
+function exportProfileData(){
+  const payload={
+    app:'Cancun 9-Week Fitness',
+    profile,
+    exportedAt:new Date().toISOString(),
+    data:loadData()
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`CancunFitness_${profile}_Backup.json`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function importProfileData(event){
+  const file=event.target.files[0]; if(!file)return;
+  try{
+    const parsed=JSON.parse(await file.text());
+    if(!parsed.data) throw new Error('Invalid backup');
+    saveData(parsed.data);
+    alert('Workout data imported for '+profile+'.');
+    renderHome();
+  }catch(e){alert('Could not import this file.')}
+  event.target.value='';
+}
+function resetCurrentProfile(){
+  if(confirm(`Delete all ${profile} workout and check-in data from this browser? Photos are not deleted by this button.`)){
+    localStorage.removeItem(storageKey());renderHome();alert('Profile workout data reset.');
+  }
+}
+function renderSettings(){
+  progressAdvice.textContent=profile==='Scott'
+    ? 'Aim to add a rep or a small amount of weight when all sets reach the top of the target range with clean form. Consistency on graveyard shifts matters more than making every workout long.'
+    : 'Prioritize consistent full-body lifting and gradual progression. Because body recomposition can hide fat loss on the scale, compare waist measurements, photos, strength and weekly average weight.';
+
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const status=document.getElementById('installStatus');
+  if(status){
+    status.innerHTML=standalone
+      ? '<b>Installed mode detected.</b> You are using the app from the iPhone Home Screen.'
+      : '<b>Browser mode detected.</b> Add this page to the iPhone Home Screen for the cleaner app-style layout.';
+  }
+  populatePlanSettingsForm();
+  applyPlanSettingsToUI();
+}
+
+profileSelect.value=profile;
+profileSelect.addEventListener('change',async e=>{
+  profile=e.target.value;
+  localStorage.setItem('cancunFitnessProfile',profile);
+  activeWorkout=null;
+  stopWorkoutTimer();
+  renderHome();renderPlan();renderSettings();
+  await renderPhotos();
+});
+
+applyPlanSettingsToUI();
+renderHome();
+renderPlan();
+renderSettings();
+
+// Keep inputs visible when the iPhone keyboard opens.
+document.addEventListener('focusin',e=>{
+  if(e.target.matches('input,textarea,select')){
+    setTimeout(()=>e.target.scrollIntoView({block:'center',behavior:'smooth'}),250);
+  }
+});
+
+// Try to keep the screen awake during an active workout when supported.
+let wakeLock=null;
+async function requestWorkoutWakeLock(){
+  try{
+    if('wakeLock' in navigator && !wakeLock) wakeLock=await navigator.wakeLock.request('screen');
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible' && workoutTimerHandle) requestWorkoutWakeLock();
+});
+const originalToggleWorkoutTimer=toggleWorkoutTimer;
+toggleWorkoutTimer=function(){
+  originalToggleWorkoutTimer();
+  if(workoutTimerHandle) requestWorkoutWakeLock();
+  else if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null;}
+};
+</script>
+</body>
+</html>
