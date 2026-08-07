@@ -221,6 +221,23 @@ label{font-size:12px;color:var(--muted)}
   font-size:38px;font-weight:900;letter-spacing:1.4px;text-align:center;
   font-variant-numeric:tabular-nums;padding:6px 0;
 }
+
+.quickWorkoutEmpty{
+  text-align:center;padding:18px 10px;
+  background:linear-gradient(135deg,rgba(95,156,255,.08),rgba(77,215,200,.04));
+  border:1px dashed rgba(95,156,255,.24);
+  border-radius:14px;margin-bottom:10px;
+}
+.exercisePicker{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.exercisePicker button{min-height:52px;text-align:left;justify-content:flex-start;padding:9px 11px}
+.customActivityBox{
+  background:linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.008)),var(--card2);
+  border:1px solid var(--line2);border-radius:12px;padding:10px;margin-top:10px;
+  box-shadow:var(--glow);
+}
+.durationGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+@media(max-width:520px){.exercisePicker{grid-template-columns:1fr}}
+
 .exercise{
   border-top:1px solid var(--line);padding:12px 0;
 }
@@ -470,8 +487,45 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
       </div>
 
       <div class="card">
-        <h3>Exercises</h3>
-        <p class="small">Your last saved weight and reps for each exercise automatically carry forward into the next workout. Change them as needed, then save the workout.</p>
+        <div class="row between">
+          <div>
+            <h3>Exercises & Activities</h3>
+            <p class="small">Scheduled exercises appear here. Add an extra strength exercise or timed activity whenever you want.</p>
+          </div>
+          <button class="btn secondary tiny" onclick="openExercisePicker()">+ Add</button>
+        </div>
+
+        <div id="quickWorkoutPrompt" class="quickWorkoutEmpty" style="display:none">
+          <h3>No Scheduled Workout</h3>
+          <p class="small">Start a quick workout by adding any exercise or activity.</p>
+          <button class="btn" onclick="openExercisePicker()">Add Exercise or Activity</button>
+        </div>
+
+        <div id="exercisePickerPanel" class="pinSettingBox" style="display:none">
+          <div class="row between">
+            <h3 style="margin:0">Add Exercise or Activity</h3>
+            <button class="btn secondary tiny" onclick="closeExercisePicker()">Close</button>
+          </div>
+          <label style="display:block;margin-top:10px">Category
+            <select id="exerciseCategorySelect" style="width:100%" onchange="renderExerciseLibrary()"></select>
+          </label>
+          <div id="exerciseLibrary" class="exercisePicker"></div>
+          <hr>
+          <h4>Custom</h4>
+          <div class="fieldgrid">
+            <label>Name
+              <input id="customExerciseName" type="text" placeholder="Custom exercise">
+            </label>
+            <label>Type
+              <select id="customExerciseType">
+                <option value="strength">Weight / Reps</option>
+                <option value="timed">Timed Activity</option>
+              </select>
+            </label>
+          </div>
+          <button class="btn secondary" style="margin-top:10px" onclick="addCustomNamedExercise()">Add Custom</button>
+        </div>
+
         <div id="exerciseList"></div>
       </div>
 
@@ -1310,6 +1364,12 @@ function showView(name){
   if(name==='plan') renderPlan();
   if(name==='progress') renderProgress();
   if(name==='settings') renderSettings();
+  if(name==='workout' && !activeWorkout){
+    const today=isoDate(new Date());
+    const p=scheduledWorkout(profile,new Date(today+'T12:00:00'));
+    if(p) openWorkout(today);
+    else openQuickWorkout(today,false);
+  }
 }
 
 function renderHome(){
@@ -1329,7 +1389,9 @@ function renderHome(){
       <button class="btn" onclick="openWorkout('${isoDate(now)}')">Open Workout</button>`;
     document.getElementById('todayBadge').textContent='Workout Day';
   }else{
-    today.innerHTML = `<h3>Recovery / Activity Day</h3><p>Hit your steps, hydration and nutrition targets. Use the end-of-day check-in below.</p>`;
+    today.innerHTML = `<h3>Recovery / Activity Day</h3>
+      <p>Hit your steps, hydration and nutrition targets. If you decide to train, you can still log a quick workout or activity.</p>
+      <button class="btn secondary" onclick="openQuickWorkout('${isoDate(now)}')">Log Exercise or Activity</button>`;
     document.getElementById('todayBadge').textContent='Recovery';
   }
 
@@ -1459,12 +1521,21 @@ function renderPlan(){
           <button class="btn tiny ${log?.completed?'secondary':''}" onclick="openWorkout('${date}')">${log?.completed?'Review':'Open'}</button>`;
       }else{
         const check=d.daily?.[date];
+        const quick=d.workouts?.[date];
         item.innerHTML=`
           <div class="daydate">${niceDate(dt)}</div>
-          <div><div class="rest">Recovery / Activity</div><div class="daydesc">${
-            check ? `${check.morningSaved?'AM ✓':'AM —'} • ${check.eveningSaved?'PM ✓':'PM —'}` : 'Morning + evening tracking'
-          }</div></div>
-          <button class="btn secondary tiny" onclick="openDayCheckin('${date}')">${check?'Review':'Check-In'}</button>`;
+          <div>
+            <div class="rest">${quick?.completed ? 'Quick Workout ✓' : 'Recovery / Activity'}</div>
+            <div class="daydesc">${
+              check
+                ? `${check.morningSaved?'AM ✓':'AM —'} • ${check.eveningSaved?'PM ✓':'PM —'}${quick?.completed?' • Activity logged':''}`
+                : (quick?.completed?'Activity logged':'Morning + evening tracking')
+            }</div>
+          </div>
+          <div class="row" style="justify-content:flex-end;gap:5px">
+            <button class="btn secondary tiny" onclick="openDayCheckin('${date}')">${check?'Review':'Check-In'}</button>
+            <button class="btn tiny" onclick="openQuickWorkout('${date}')">${quick?.completed?'Review':'Workout'}</button>
+          </div>`;
       }
       section.appendChild(item);
     }
@@ -1486,6 +1557,145 @@ function scrollToToday(){
   const el=document.querySelector(`.day[data-date="${today}"]`);
   if(el) el.scrollIntoView({behavior:'smooth',block:'center'});
   else document.getElementById('week-1').scrollIntoView({behavior:'smooth'});
+}
+
+
+const EXERCISE_LIBRARY = {
+  'Upper Body':[
+    {name:'Bench Press',type:'strength'},{name:'Incline Bench Press',type:'strength'},
+    {name:'Dumbbell Chest Press',type:'strength'},{name:'Chest Fly',type:'strength'},
+    {name:'Push-Ups',type:'strength'},{name:'Shoulder Press',type:'strength'},
+    {name:'Lateral Raise',type:'strength'},{name:'Front Raise',type:'strength'},
+    {name:'Seated / Cable Row',type:'strength'},{name:'Dumbbell Row',type:'strength'},
+    {name:'Lat Pulldown',type:'strength'},{name:'Pull-Ups',type:'strength'},
+    {name:'Biceps Curl',type:'strength'},{name:'Hammer Curl',type:'strength'},
+    {name:'Triceps Pressdown',type:'strength'},{name:'Triceps Extension',type:'strength'}
+  ],
+  'Lower Body':[
+    {name:'Back Squat',type:'strength'},{name:'Goblet Squat',type:'strength'},
+    {name:'Leg Press',type:'strength'},{name:'Romanian Deadlift',type:'strength'},
+    {name:'Deadlift',type:'strength'},{name:'Walking Lunges',type:'strength'},
+    {name:'Reverse Lunges',type:'strength'},{name:'Leg Curl',type:'strength'},
+    {name:'Leg Extension',type:'strength'},{name:'Hip Thrust',type:'strength'},
+    {name:'Glute Bridge',type:'strength'},{name:'Calf Raise',type:'strength'}
+  ],
+  'Core':[
+    {name:'Plank',type:'timed'},{name:'Side Plank',type:'timed'},
+    {name:'Cable Crunch',type:'strength'},{name:'Sit-Ups',type:'strength'},
+    {name:'Crunches',type:'strength'},{name:'Russian Twists',type:'strength'},
+    {name:'Hanging Knee Raise',type:'strength'}
+  ],
+  'Cardio':[
+    {name:'Walking',type:'timed'},{name:'Running',type:'timed'},
+    {name:'Treadmill',type:'timed'},{name:'Incline Walking',type:'timed'},
+    {name:'Cycling',type:'timed'},{name:'Stationary Bike',type:'timed'},
+    {name:'Elliptical',type:'timed'},{name:'Stair Climber',type:'timed'},
+    {name:'Rowing Machine',type:'timed'},{name:'Swimming',type:'timed'}
+  ],
+  'Sports & Outdoor':[
+    {name:'Soccer',type:'timed'},{name:'Basketball',type:'timed'},
+    {name:'Football',type:'timed'},{name:'Pickleball',type:'timed'},
+    {name:'Tennis',type:'timed'},{name:'Hiking',type:'timed'},
+    {name:'Rucking',type:'timed'},{name:'Yard Work',type:'timed'}
+  ],
+  'Mobility & Recovery':[
+    {name:'Stretching',type:'timed'},{name:'Mobility Work',type:'timed'},
+    {name:'Yoga',type:'timed'},{name:'Foam Rolling',type:'timed'}
+  ]
+};
+
+let customWorkoutItems=[];
+
+function initializeExercisePicker(){
+  const sel=document.getElementById('exerciseCategorySelect');
+  if(!sel) return;
+  sel.innerHTML='';
+  Object.keys(EXERCISE_LIBRARY).forEach(cat=>{
+    const o=document.createElement('option');o.value=cat;o.textContent=cat;sel.appendChild(o);
+  });
+  renderExerciseLibrary();
+}
+function renderExerciseLibrary(){
+  const sel=document.getElementById('exerciseCategorySelect');
+  const box=document.getElementById('exerciseLibrary');
+  if(!sel||!box) return;
+  box.innerHTML='';
+  (EXERCISE_LIBRARY[sel.value]||[]).forEach(item=>{
+    const b=document.createElement('button');
+    b.className='btn secondary';
+    b.innerHTML=`<span><b>${item.name}</b><br><span class="small muted">${item.type==='timed'?'Minutes / optional distance':'Weight / reps'}</span></span>`;
+    b.onclick=()=>addExerciseToActiveWorkout(item.name,item.type);
+    box.appendChild(b);
+  });
+}
+function openExercisePicker(){
+  if(!activeWorkout) openQuickWorkout(isoDate(new Date()),false);
+  exercisePickerPanel.style.display='block';
+  initializeExercisePicker();
+  exercisePickerPanel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function closeExercisePicker(){exercisePickerPanel.style.display='none'}
+function addCustomNamedExercise(){
+  const name=customExerciseName.value.trim();
+  if(!name) return alert('Enter an exercise or activity name.');
+  addExerciseToActiveWorkout(name,customExerciseType.value);
+  customExerciseName.value='';
+}
+function addExerciseToActiveWorkout(name,type='strength'){
+  customWorkoutItems.push({
+    id:'custom_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    name,type,target:type==='timed'?'Timed':'3 sets'
+  });
+  renderActiveWorkoutExercises();
+  closeExercisePicker();
+}
+function removeCustomWorkoutItem(id){
+  customWorkoutItems=customWorkoutItems.filter(x=>x.id!==id);
+  renderActiveWorkoutExercises();
+}
+function timedActivityMarkup(item,index,saved){
+  return `
+    <div class="customActivityBox">
+      <div class="exhead">
+        <div><strong>${item.name}</strong><div class="previous">Timed activity</div></div>
+        <button class="btn red tiny" onclick="removeCustomWorkoutItem('${item.id}')">Remove</button>
+      </div>
+      <div class="durationGrid">
+        <label>Minutes
+          <input id="custom_minutes_${index}" type="number" inputmode="numeric" min="0" step="1" value="${saved?.minutes ?? ''}" placeholder="30">
+        </label>
+        <label>Distance (optional)
+          <input id="custom_distance_${index}" type="number" inputmode="decimal" min="0" step="0.1" value="${saved?.distance ?? ''}" placeholder="miles">
+        </label>
+      </div>
+      <label style="display:block;margin-top:8px">Notes
+        <input id="custom_note_${index}" type="text" value="${saved?.note ?? ''}" placeholder="Pace, intensity, game, etc.">
+      </label>
+    </div>`;
+}
+function customStrengthMarkup(item,index,saved){
+  const prev=findPreviousExercise(item.name,activeWorkout.date);
+  const source=saved?.sets?.length?saved.sets:(prev?.sets||[]);
+  const sets=[0,1,2].map(s=>({weight:source[s]?.weight??'',reps:source[s]?.reps??''}));
+  return `
+    <div class="exercise">
+      <div class="exhead">
+        <div><strong>${item.name}</strong><div class="previous">${previousExerciseText(prev)}</div></div>
+        <button class="btn red tiny" onclick="removeCustomWorkoutItem('${item.id}')">Remove</button>
+      </div>
+      <div class="setgrid">
+        ${[0,1,2].map(s=>`
+          <div class="setbox">
+            <div class="settitle">Set ${s+1}</div>
+            <label class="setfield"><span>WEIGHT</span>
+              <input id="custom_w_${index}_${s}" type="number" inputmode="decimal" step="0.5" placeholder="lb" value="${sets[s].weight}">
+            </label>
+            <label class="setfield"><span>REPS</span>
+              <input id="custom_r_${index}_${s}" type="number" inputmode="numeric" step="1" placeholder="reps" value="${sets[s].reps}">
+            </label>
+          </div>`).join('')}
+      </div>
+    </div>`;
 }
 
 function findPreviousExercise(exerciseName,currentDate){
@@ -1520,104 +1730,140 @@ function previousExerciseText(previous){
   });
   return `Last: ${parts.join(' • ')}`;
 }
-function openWorkout(date){
-  const dt=new Date(date+'T12:00:00');
-  const p=scheduledWorkout(profile,dt);
-  if(!p) return alert('No workout is scheduled for this date.');
-
-  const existing=loadData().workouts?.[date]||{};
-  activeWorkout={date,plan:p};
-
-  workoutName.textContent=p.name;
-  workoutDateText.textContent=`${profile} • ${niceDate(dt)} • Week ${weekNumber(dt)}`;
+function renderActiveWorkoutExercises(existingOverride){
+  const existing=existingOverride || (activeWorkout ? loadData().workouts?.[activeWorkout.date] : {}) || {};
   exerciseList.innerHTML='';
 
-  p.template.exercises.forEach((ex,i)=>{
-    const previous=findPreviousExercise(ex[0],date);
+  const scheduled=activeWorkout?.plan?.template?.exercises||[];
+  scheduled.forEach((ex,i)=>{
+    const previous=findPreviousExercise(ex[0],activeWorkout.date);
     const savedEx=(existing.exercises||[])[i]||null;
-
-    // If this workout has already been saved, use its own values.
-    // Otherwise carry forward the last saved weights AND reps for this exercise.
-    const sourceSets = savedEx?.sets?.length ? savedEx.sets : (previous?.sets || []);
-    const sets=[0,1,2].map(s=>({
-      weight:sourceSets[s]?.weight ?? '',
-      reps:sourceSets[s]?.reps ?? ''
-    }));
-
+    const source=savedEx?.sets?.length?savedEx.sets:(previous?.sets||[]);
+    const sets=[0,1,2].map(s=>({weight:source[s]?.weight??'',reps:source[s]?.reps??''}));
     const div=document.createElement('div');
     div.className='exercise';
     div.innerHTML=`
       <div class="exhead">
-        <div>
-          <strong>${ex[0]}</strong>
-          <div class="previous">${previousExerciseText(previous)}</div>
-        </div>
+        <div><strong>${ex[0]}</strong><div class="previous">${previousExerciseText(previous)}</div></div>
         <div class="target">${ex[1]}</div>
       </div>
-
       <div class="setgrid">
         ${[0,1,2].map(s=>`
           <div class="setbox">
             <div class="settitle">Set ${s+1}</div>
-
-            <label class="setfield">
-              <span>WEIGHT</span>
-              <input
-                id="w_${i}_${s}"
-                type="number"
-                inputmode="decimal"
-                step="0.5"
-                placeholder="lb"
-                value="${sets[s].weight}">
+            <label class="setfield"><span>WEIGHT</span>
+              <input id="w_${i}_${s}" type="number" inputmode="decimal" step="0.5" placeholder="lb" value="${sets[s].weight}">
             </label>
-
-            <label class="setfield">
-              <span>REPS</span>
-              <input
-                id="r_${i}_${s}"
-                type="number"
-                inputmode="numeric"
-                step="1"
-                placeholder="reps"
-                value="${sets[s].reps}">
+            <label class="setfield"><span>REPS</span>
+              <input id="r_${i}_${s}" type="number" inputmode="numeric" step="1" placeholder="reps" value="${sets[s].reps}">
             </label>
           </div>`).join('')}
       </div>`;
     exerciseList.appendChild(div);
   });
 
+  if(!customWorkoutItems.length && Array.isArray(existing.customItems)){
+    customWorkoutItems=existing.customItems.map(x=>({...x}));
+  }
+  customWorkoutItems.forEach((item,index)=>{
+    const saved=(existing.customItems||[]).find(x=>x.id===item.id)||item;
+    const holder=document.createElement('div');
+    holder.innerHTML=item.type==='timed'
+      ? timedActivityMarkup(item,index,saved)
+      : customStrengthMarkup(item,index,saved);
+    while(holder.firstChild) exerciseList.appendChild(holder.firstChild);
+  });
+
+  quickWorkoutPrompt.style.display=(!scheduled.length&&!customWorkoutItems.length)?'block':'none';
+}
+
+function openQuickWorkout(date,openPicker=true){
+  const dt=new Date(date+'T12:00:00');
+  const existing=loadData().workouts?.[date]||{};
+  activeWorkout={date,plan:{name:'Quick Workout',template:{exercises:[]}},quick:true};
+  customWorkoutItems=(existing.customItems||[]).map(x=>({...x}));
+  workoutName.textContent=existing.name||'Quick Workout';
+  workoutDateText.textContent=`${profileDisplayName()} • ${niceDate(dt)} • Custom / Extra`;
   woNotes.value=existing.notes||'';
   workoutElapsed=existing.duration||0;
   renderWorkoutTimer();
+  renderActiveWorkoutExercises(existing);
+  showView('workout');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(openPicker && !customWorkoutItems.length) setTimeout(openExercisePicker,80);
+}
+
+function openWorkout(date){
+  const dt=new Date(date+'T12:00:00');
+  const p=scheduledWorkout(profile,dt);
+  if(!p) return openQuickWorkout(date);
+
+  const existing=loadData().workouts?.[date]||{};
+  activeWorkout={date,plan:p,quick:false};
+  customWorkoutItems=(existing.customItems||[]).map(x=>({...x}));
+
+  workoutName.textContent=p.name;
+  workoutDateText.textContent=`${profileDisplayName()} • ${niceDate(dt)} • Week ${weekNumber(dt)}`;
+  woNotes.value=existing.notes||'';
+  workoutElapsed=existing.duration||0;
+  renderWorkoutTimer();
+  renderActiveWorkoutExercises(existing);
   showView('workout');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function saveWorkout(){
-  if(!activeWorkout) return alert('Open a workout from the Plan first.');
+  if(!activeWorkout) return alert('Open a workout or start a quick workout first.');
   const d=loadData();
-  const exercises=activeWorkout.plan.template.exercises.map((ex,i)=>({
-    name:ex[0],
-    target:ex[1],
+  const scheduled=activeWorkout.plan?.template?.exercises||[];
+
+  const exercises=scheduled.map((ex,i)=>({
+    name:ex[0],target:ex[1],
     sets:[0,1,2].map(s=>({
-      weight:document.getElementById(`w_${i}_${s}`).value ? Number(document.getElementById(`w_${i}_${s}`).value) : '',
-      reps:document.getElementById(`r_${i}_${s}`).value ? Number(document.getElementById(`r_${i}_${s}`).value) : ''
+      weight:document.getElementById(`w_${i}_${s}`)?.value ? Number(document.getElementById(`w_${i}_${s}`).value) : '',
+      reps:document.getElementById(`r_${i}_${s}`)?.value ? Number(document.getElementById(`r_${i}_${s}`).value) : ''
     }))
   }));
+
+  const savedCustomItems=customWorkoutItems.map((item,index)=>{
+    if(item.type==='timed'){
+      return {
+        ...item,
+        minutes:document.getElementById(`custom_minutes_${index}`)?.value ? Number(document.getElementById(`custom_minutes_${index}`).value) : '',
+        distance:document.getElementById(`custom_distance_${index}`)?.value ? Number(document.getElementById(`custom_distance_${index}`).value) : '',
+        note:document.getElementById(`custom_note_${index}`)?.value||''
+      };
+    }
+    return {
+      ...item,
+      sets:[0,1,2].map(s=>({
+        weight:document.getElementById(`custom_w_${index}_${s}`)?.value ? Number(document.getElementById(`custom_w_${index}_${s}`).value) : '',
+        reps:document.getElementById(`custom_r_${index}_${s}`)?.value ? Number(document.getElementById(`custom_r_${index}_${s}`).value) : ''
+      }))
+    };
+  });
+
+  // Put custom strength exercises into normal strength history so they carry forward.
+  savedCustomItems.filter(x=>x.type==='strength').forEach(item=>{
+    exercises.push({name:item.name,target:'Custom',sets:item.sets||[]});
+  });
+
   d.workouts[activeWorkout.date]={
     date:activeWorkout.date,
-    name:activeWorkout.plan.name,
+    name:activeWorkout.quick?'Quick Workout':activeWorkout.plan.name,
     exercises,
+    customItems:savedCustomItems,
     notes:woNotes.value,
     duration:workoutElapsed,
     completed:true,
+    quick:!!activeWorkout.quick,
     savedAt:new Date().toISOString()
   };
   saveData(d);
+  customWorkoutItems=savedCustomItems.map(x=>({...x}));
   stopWorkoutTimer();
-  alert('Workout saved. End-of-day stats are tracked separately on Home.');
+  alert('Workout saved. Morning and evening check-ins remain separate on Home.');
   renderPlan();
 }
-
 function formatDuration(seconds){
   const h=Math.floor(seconds/3600);
   const m=Math.floor((seconds%3600)/60);
@@ -1839,7 +2085,10 @@ async function renderProgress(){
   renderLineChart('energyChart',energy,p=>fmt1(p));
 
   const records=workoutRecords();
-  const volumes=records.map(r=>r.volume);
+  // Timed/cardio/sport-only sessions count toward consistency, but are excluded
+  // from lifting-volume averages so a 45-minute walk does not look like a 0-lb lifting workout.
+  const strengthRecords=records.filter(r=>r.volume>0);
+  const volumes=strengthRecords.map(r=>r.volume);
   const lastVol=volumes.at(-1);
   const avgVol=average(volumes);
   const bestVol=volumes.length?Math.max(...volumes):null;
@@ -1852,10 +2101,10 @@ async function renderProgress(){
     ? `${((lastVol-firstVol)/firstVol*100)>=0?'+':''}${((lastVol-firstVol)/firstVol*100).toFixed(0)}%`
     : '—';
 
-  renderWorkoutTypeVolumes(records);
+  renderWorkoutTypeVolumes(strengthRecords);
   renderLineChart(
     'volumeChart',
-    records.filter(r=>r.volume>0).map(r=>({date:r.date,value:r.volume})),
+    strengthRecords.map(r=>({date:r.date,value:r.volume})),
     p=>`${fmtInt(p)}`
   );
 
@@ -2078,6 +2327,7 @@ profileSelect.addEventListener('change',async e=>{
   profile=e.target.value;
   localStorage.setItem('cancunFitnessProfile',profile);
   activeWorkout=null;
+  customWorkoutItems=[];
   stopWorkoutTimer();
   renderHome();renderPlan();renderSettings();
   await renderProgress();
