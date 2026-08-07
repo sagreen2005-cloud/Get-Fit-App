@@ -216,18 +216,29 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
       </div>
 
       <div class="card">
-        <h3>Daily Check-In</h3>
+        <h3>Morning Check-In</h3>
+        <p class="small">Log your body weight and how your energy feels at the start of the day.</p>
         <div class="fieldgrid">
           <label>Date<input id="dailyDate" type="date"></label>
           <label>Body Weight (lb)<input id="dailyWeight" type="number" step="0.1"></label>
+          <label>Morning Energy (1–5)<input id="dailyEnergy" type="number" min="1" max="5"></label>
+        </div>
+        <div id="morningWorkoutPrompt" style="margin-top:10px"></div>
+        <button class="btn" style="margin-top:12px" onclick="saveMorningCheckin()">Save Morning Check-In</button>
+      </div>
+
+      <div class="card">
+        <h3>Evening Check-Out</h3>
+        <p class="small">At the end of the day, record your total steps and whether you met your water and protein goals.</p>
+        <div class="fieldgrid">
+          <label>Date<input id="eveningDate" type="date"></label>
           <label>Steps<input id="dailySteps" type="number" step="1"></label>
-          <label>Energy (1–5)<input id="dailyEnergy" type="number" min="1" max="5"></label>
         </div>
         <div class="checks">
           <label><input id="dailyWater" type="checkbox"> Water goal met</label>
           <label><input id="dailyProtein" type="checkbox"> Protein goal met</label>
         </div>
-        <button class="btn" style="margin-top:12px" onclick="saveDailyCheckin()">Save Check-In</button>
+        <button class="btn" style="margin-top:12px" onclick="saveEveningCheckout()">Save Evening Check-Out</button>
       </div>
 
       <div class="card">
@@ -241,7 +252,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
         <div class="row between">
           <div>
             <h2>9-Week Plan</h2>
-            <p class="small">Every day is listed. Workout days open the exercise tracker; recovery days can still be used for your daily check-in.</p>
+            <p class="small">Every day is listed. Workout days open the exercise tracker; recovery days can still be used for your end-of-day check-in.</p>
           </div>
           <button class="btn secondary tiny" onclick="scrollToToday()">Today</button>
         </div>
@@ -273,6 +284,13 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
       </div>
 
       <div class="card">
+        <h3>Workout Notes</h3>
+        <label style="display:block">Notes
+          <textarea id="woNotes" rows="3" style="width:100%" placeholder="Optional notes about the workout"></textarea>
+        </label>
+      </div>
+
+      <div class="card">
         <h3>Rest Timer</h3>
         <div id="restTimer" class="timer">01:30</div>
         <div class="row" style="justify-content:center">
@@ -284,19 +302,10 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
       </div>
 
       <div class="card">
-        <h3>Workout Check-In</h3>
-        <div class="fieldgrid">
-          <label>Body Weight (lb)<input id="woWeight" type="number" step="0.1"></label>
-          <label>Steps<input id="woSteps" type="number"></label>
-          <label>Energy (1–5)<input id="woEnergy" type="number" min="1" max="5"></label>
-        </div>
-        <div class="checks">
-          <label><input id="woWater" type="checkbox"> Water goal met</label>
-          <label><input id="woProtein" type="checkbox"> Protein goal met</label>
-        </div>
-        <label style="display:block;margin-top:10px">Notes<textarea id="woNotes" rows="3" style="width:100%"></textarea></label>
-        <button class="btn green" style="margin-top:12px" onclick="saveWorkout()">Save Completed Workout</button>
+        <button class="btn green" style="width:100%" onclick="saveWorkout()">Save Completed Workout</button>
+        <p class="small" style="margin-bottom:0">Body weight and energy are tracked in the Morning Check-In. Steps, water, and protein are tracked in the Evening Check-Out on Home.</p>
       </div>
+
     </section>
 
     <section id="photosView" class="view">
@@ -382,7 +391,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <h2>Storage & Backup</h2>
-        <p>Workout logs, daily check-ins and preferences are stored only in this browser. Photos are stored only in this browser's IndexedDB database. There is no Firebase code or network sync in this file.</p>
+        <p>Workout logs, end-of-day check-ins and preferences are stored only in this browser. Photos are stored only in this browser's IndexedDB database. There is no Firebase code or network sync in this file.</p>
         <button class="btn" onclick="exportProfileData()">Export Workout Data</button>
         <label class="btn secondary" style="display:inline-block;margin-left:5px">
           Import Workout Data
@@ -745,6 +754,7 @@ function renderHome(){
   document.getElementById('homeDate').textContent =
     `${niceDate(now)} • ${ps.goalName || 'Goal'}${ps.goalDate ? ' '+formatLongDate(ps.goalDate) : ''}`;
   document.getElementById('dailyDate').value = isoDate(now);
+  document.getElementById('eveningDate').value = isoDate(now);
 
   const p = scheduledWorkout(profile,now);
   const today = document.getElementById('todayCard');
@@ -753,7 +763,7 @@ function renderHome(){
       <button class="btn" onclick="openWorkout('${isoDate(now)}')">Open Workout</button>`;
     document.getElementById('todayBadge').textContent='Workout Day';
   }else{
-    today.innerHTML = `<h3>Recovery / Activity Day</h3><p>Hit your steps, hydration and nutrition targets. Use the daily check-in below.</p>`;
+    today.innerHTML = `<h3>Recovery / Activity Day</h3><p>Hit your steps, hydration and nutrition targets. Use the end-of-day check-in below.</p>`;
     document.getElementById('todayBadge').textContent='Recovery';
   }
 
@@ -775,33 +785,80 @@ function renderHome(){
      <span class="pill">Steps ${t.steps}</span>
      <p>${t.advice}</p>`;
 
-  loadCheckinForDate(document.getElementById('dailyDate').value);
+  const todayDate=document.getElementById('dailyDate').value;
+  loadMorningForDate(todayDate);
+  loadEveningForDate(document.getElementById('eveningDate').value);
+  renderMorningWorkoutPrompt(todayDate);
 }
 
-document.getElementById('dailyDate').addEventListener('change',e=>loadCheckinForDate(e.target.value));
-function loadCheckinForDate(date){
+document.getElementById('dailyDate').addEventListener('change',e=>{
+  loadMorningForDate(e.target.value);
+  renderMorningWorkoutPrompt(e.target.value);
+});
+document.getElementById('eveningDate').addEventListener('change',e=>loadEveningForDate(e.target.value));
+
+function loadMorningForDate(date){
   const x=loadData().daily?.[date]||{};
   dailyWeight.value=x.weight||'';
-  dailySteps.value=x.steps||'';
   dailyEnergy.value=x.energy||'';
+}
+
+function loadEveningForDate(date){
+  const x=loadData().daily?.[date]||{};
+  dailySteps.value=x.steps||'';
   dailyWater.checked=!!x.water;
   dailyProtein.checked=!!x.protein;
 }
-function saveDailyCheckin(){
+
+function renderMorningWorkoutPrompt(date){
+  const box=document.getElementById('morningWorkoutPrompt');
+  if(!box) return;
+  const dt=new Date(date+'T12:00:00');
+  const p=scheduledWorkout(profile,dt);
+  if(p){
+    box.innerHTML=`<div class="notice"><b>Workout today:</b> ${p.name}
+      <div style="margin-top:8px"><button class="btn tiny" onclick="openWorkout('${date}')">Open Today's Workout</button></div>
+    </div>`;
+  }else{
+    box.innerHTML='<div class="notice">No scheduled workout today. Recovery, steps, hydration, and nutrition still count.</div>';
+  }
+}
+
+function saveMorningCheckin(){
   const date=dailyDate.value;
   if(!date) return alert('Choose a date.');
   const d=loadData();
+  const existing=d.daily[date]||{date};
   d.daily[date]={
+    ...existing,
     date,
     weight:dailyWeight.value ? Number(dailyWeight.value) : '',
-    steps:dailySteps.value ? Number(dailySteps.value) : '',
     energy:dailyEnergy.value ? Number(dailyEnergy.value) : '',
-    water:dailyWater.checked,
-    protein:dailyProtein.checked
+    morningSaved:true,
+    morningSavedAt:new Date().toISOString()
   };
   saveData(d);
   renderHome();
-  alert('Saved on this device.');
+  alert('Morning check-in saved.');
+}
+
+function saveEveningCheckout(){
+  const date=eveningDate.value;
+  if(!date) return alert('Choose a date.');
+  const d=loadData();
+  const existing=d.daily[date]||{date};
+  d.daily[date]={
+    ...existing,
+    date,
+    steps:dailySteps.value ? Number(dailySteps.value) : '',
+    water:dailyWater.checked,
+    protein:dailyProtein.checked,
+    eveningSaved:true,
+    eveningSavedAt:new Date().toISOString()
+  };
+  saveData(d);
+  renderHome();
+  alert('Evening check-out saved.');
 }
 
 function renderPlan(){
@@ -829,13 +886,15 @@ function renderPlan(){
       if(p){
         item.innerHTML=`
           <div class="daydate">${niceDate(dt)}</div>
-          <div><div class="dayname">${p.name}</div><div class="daydesc">${p.template.exercises.length} exercises${log?.completed?' • Completed':''}</div></div>
+          <div><div class="dayname">${p.name}</div><div class="daydesc">${p.template.exercises.length} exercises${log?.completed?' • Workout ✓':''}${d.daily?.[date]?.morningSaved?' • AM ✓':''}${d.daily?.[date]?.eveningSaved?' • PM ✓':''}</div></div>
           <button class="btn tiny ${log?.completed?'secondary':''}" onclick="openWorkout('${date}')">${log?.completed?'Review':'Open'}</button>`;
       }else{
         const check=d.daily?.[date];
         item.innerHTML=`
           <div class="daydate">${niceDate(dt)}</div>
-          <div><div class="rest">Recovery / Activity</div><div class="daydesc">${check?'Check-in saved':'Steps • water • protein • recovery'}</div></div>
+          <div><div class="rest">Recovery / Activity</div><div class="daydesc">${
+            check ? `${check.morningSaved?'AM ✓':'AM —'} • ${check.eveningSaved?'PM ✓':'PM —'}` : 'Morning + evening tracking'
+          }</div></div>
           <button class="btn secondary tiny" onclick="openDayCheckin('${date}')">${check?'Review':'Check-In'}</button>`;
       }
       section.appendChild(item);
@@ -847,7 +906,10 @@ function renderPlan(){
 function openDayCheckin(date){
   showView('home');
   dailyDate.value=date;
-  loadCheckinForDate(date);
+  eveningDate.value=date;
+  loadMorningForDate(date);
+  loadEveningForDate(date);
+  renderMorningWorkoutPrompt(date);
   window.scrollTo({top:document.querySelector('#homeView .card:nth-of-type(2)').offsetTop-70,behavior:'smooth'});
 }
 function scrollToToday(){
@@ -955,11 +1017,6 @@ function openWorkout(date){
     exerciseList.appendChild(div);
   });
 
-  woWeight.value=existing.weight||'';
-  woSteps.value=existing.steps||'';
-  woEnergy.value=existing.energy||'';
-  woWater.checked=!!existing.water;
-  woProtein.checked=!!existing.protein;
   woNotes.value=existing.notes||'';
   workoutElapsed=existing.duration||0;
   renderWorkoutTimer();
@@ -981,27 +1038,14 @@ function saveWorkout(){
     date:activeWorkout.date,
     name:activeWorkout.plan.name,
     exercises,
-    weight:woWeight.value ? Number(woWeight.value) : '',
-    steps:woSteps.value ? Number(woSteps.value) : '',
-    energy:woEnergy.value ? Number(woEnergy.value) : '',
-    water:woWater.checked,
-    protein:woProtein.checked,
     notes:woNotes.value,
     duration:workoutElapsed,
     completed:true,
     savedAt:new Date().toISOString()
   };
-  d.daily[activeWorkout.date]={
-    date:activeWorkout.date,
-    weight:woWeight.value ? Number(woWeight.value) : '',
-    steps:woSteps.value ? Number(woSteps.value) : '',
-    energy:woEnergy.value ? Number(woEnergy.value) : '',
-    water:woWater.checked,
-    protein:woProtein.checked
-  };
   saveData(d);
   stopWorkoutTimer();
-  alert('Workout saved on this device.');
+  alert('Workout saved. End-of-day stats are tracked separately on Home.');
   renderPlan();
 }
 
