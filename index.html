@@ -127,11 +127,16 @@ label{font-size:12px;color:var(--muted)}
 .exhead{display:flex;justify-content:space-between;gap:8px}
 .target{font-size:12px;color:var(--muted);white-space:nowrap}
 .previous{font-size:11px;color:var(--yellow);margin-top:3px}
-.setgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
-.setbox{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px}
-.setbox b{font-size:11px;color:var(--muted)}
-.setrow{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}
-.setrow input{min-width:0;padding:8px}
+.setgrid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.setbox{
+  display:grid;grid-template-columns:70px 1fr 1fr;gap:8px;align-items:end;
+  background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:9px
+}
+.settitle{font-size:13px;font-weight:800;color:var(--text);align-self:center}
+.setfield{display:flex;flex-direction:column;gap:4px}
+.setfield span{font-size:11px;color:var(--muted);font-weight:700}
+.setfield input{width:100%;min-width:0;padding:9px}
+.previous{font-size:12px;color:var(--yellow);margin-top:4px;line-height:1.35}
 .photoTools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .photoTools input{grid-column:1/-1}
 .photoPick{display:block}
@@ -162,8 +167,9 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
   .fieldgrid{grid-template-columns:repeat(2,1fr)}
   .day{grid-template-columns:64px 1fr auto;gap:7px;padding:9px}
   .photoGrid{grid-template-columns:repeat(2,1fr)}
-  .setgrid{gap:5px}
-  .setbox{padding:6px}
+  .setgrid{gap:7px}
+  .setbox{grid-template-columns:58px 1fr 1fr;padding:8px}
+  .settitle{font-size:12px}
   .card{padding:13px}
 }
 @media(display-mode:standalone){
@@ -262,6 +268,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <h3>Exercises</h3>
+        <p class="small">Your last saved weight and reps for each exercise automatically carry forward into the next workout. Change them as needed, then save the workout.</p>
         <div id="exerciseList"></div>
       </div>
 
@@ -852,22 +859,41 @@ function scrollToToday(){
 
 function findPreviousExercise(exerciseName,currentDate){
   const d=loadData();
-  const dates=Object.keys(d.workouts||{}).filter(x=>x<currentDate).sort().reverse();
+  const dates=Object.keys(d.workouts||{})
+    .filter(x=>x<currentDate && d.workouts[x]?.completed)
+    .sort()
+    .reverse();
+
   for(const date of dates){
     const wo=d.workouts[date];
     const found=(wo.exercises||[]).find(x=>x.name===exerciseName);
     if(found){
-      const text=(found.sets||[]).map((s,i)=>`S${i+1}: ${s.weight||'—'} × ${s.reps||'—'}`).join(' | ');
-      return text;
+      return {
+        date,
+        sets:(found.sets||[]).map(s=>({
+          weight:s?.weight ?? '',
+          reps:s?.reps ?? ''
+        }))
+      };
     }
   }
-  return '';
+  return null;
 }
 
+function previousExerciseText(previous){
+  if(!previous) return 'No previous entry';
+  const parts=(previous.sets||[]).map((s,i)=>{
+    const weight=(s.weight!=='' && s.weight!=null) ? s.weight : '—';
+    const reps=(s.reps!=='' && s.reps!=null) ? s.reps : '—';
+    return `Set ${i+1}: ${weight} lb × ${reps}`;
+  });
+  return `Last: ${parts.join(' • ')}`;
+}
 function openWorkout(date){
   const dt=new Date(date+'T12:00:00');
   const p=scheduledWorkout(profile,dt);
   if(!p) return alert('No workout is scheduled for this date.');
+
   const existing=loadData().workouts?.[date]||{};
   activeWorkout={date,plan:p};
 
@@ -876,24 +902,54 @@ function openWorkout(date){
   exerciseList.innerHTML='';
 
   p.template.exercises.forEach((ex,i)=>{
-    const prior=findPreviousExercise(ex[0],date);
-    const savedEx=(existing.exercises||[])[i]||{};
-    const sets=savedEx.sets||[];
+    const previous=findPreviousExercise(ex[0],date);
+    const savedEx=(existing.exercises||[])[i]||null;
+
+    // If this workout has already been saved, use its own values.
+    // Otherwise carry forward the last saved weights AND reps for this exercise.
+    const sourceSets = savedEx?.sets?.length ? savedEx.sets : (previous?.sets || []);
+    const sets=[0,1,2].map(s=>({
+      weight:sourceSets[s]?.weight ?? '',
+      reps:sourceSets[s]?.reps ?? ''
+    }));
+
     const div=document.createElement('div');
     div.className='exercise';
     div.innerHTML=`
       <div class="exhead">
-        <div><strong>${ex[0]}</strong><div class="previous">${prior ? 'Previous: '+prior : 'No previous entry'}</div></div>
+        <div>
+          <strong>${ex[0]}</strong>
+          <div class="previous">${previousExerciseText(previous)}</div>
+        </div>
         <div class="target">${ex[1]}</div>
       </div>
+
       <div class="setgrid">
         ${[0,1,2].map(s=>`
           <div class="setbox">
-            <b>SET ${s+1}</b>
-            <div class="setrow">
-              <input id="w_${i}_${s}" type="number" step="0.5" placeholder="Wt" value="${sets[s]?.weight ?? ''}">
-              <input id="r_${i}_${s}" type="number" step="1" placeholder="Reps" value="${sets[s]?.reps ?? ''}">
-            </div>
+            <div class="settitle">Set ${s+1}</div>
+
+            <label class="setfield">
+              <span>WEIGHT</span>
+              <input
+                id="w_${i}_${s}"
+                type="number"
+                inputmode="decimal"
+                step="0.5"
+                placeholder="lb"
+                value="${sets[s].weight}">
+            </label>
+
+            <label class="setfield">
+              <span>REPS</span>
+              <input
+                id="r_${i}_${s}"
+                type="number"
+                inputmode="numeric"
+                step="1"
+                placeholder="reps"
+                value="${sets[s].reps}">
+            </label>
           </div>`).join('')}
       </div>`;
     exerciseList.appendChild(div);
@@ -910,7 +966,6 @@ function openWorkout(date){
   showView('workout');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
 function saveWorkout(){
   if(!activeWorkout) return alert('Open a workout from the Plan first.');
   const d=loadData();
