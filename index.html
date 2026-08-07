@@ -60,6 +60,13 @@ button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:tran
   border-bottom:1px solid var(--line2);
   box-shadow:0 4px 20px rgba(0,0,0,.14);
   padding:calc(10px + env(safe-area-inset-top)) 0 10px;
+  transform:translateY(0);
+  transition:transform .22s ease, box-shadow .22s ease;
+  will-change:transform;
+}
+.top.header-hidden{
+  transform:translateY(calc(-100% - env(safe-area-inset-top)));
+  box-shadow:none;
 }
 .top::after{
   content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
@@ -307,6 +314,42 @@ details[open] summary::after{content:"⌃"}
   border-radius:12px;
 }
 hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+
+.pinOverlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(95,156,255,.18),transparent 32%),
+    radial-gradient(circle at 85% 10%,rgba(77,215,200,.10),transparent 28%),
+    linear-gradient(180deg,#132238,#0a121d);
+  align-items:center;justify-content:center;
+  padding:max(22px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right))
+          max(22px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));
+}
+.pinOverlay.show{display:flex}
+.pinPanel{
+  width:min(390px,100%);background:var(--card);
+  border:1px solid var(--line2);border-radius:22px;padding:22px;
+  box-shadow:0 24px 60px rgba(0,0,0,.38),var(--glow);
+  text-align:center;
+}
+.pinIcon{
+  width:58px;height:58px;border-radius:18px;margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(95,156,255,.18),rgba(77,215,200,.12));
+  border:1px solid rgba(95,156,255,.22);
+  font-size:28px;
+}
+.pinEntry{
+  width:180px;max-width:100%;text-align:center;font-size:28px;font-weight:900;
+  letter-spacing:12px;padding-left:12px;margin:10px auto 0;
+}
+.pinError{min-height:20px;color:var(--red);font-size:12px;margin-top:8px}
+.pinSettingBox{
+  background:linear-gradient(135deg,rgba(95,156,255,.08),rgba(77,215,200,.04));
+  border:1px solid rgba(95,156,255,.14);
+  border-radius:14px;padding:12px;margin-top:10px;
+}
+
 @media(max-width:650px){
   .brand h1{font-size:18px}
   .brand div{font-size:11px}
@@ -326,7 +369,8 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
   body{background:linear-gradient(180deg, var(--bg2), var(--bg))}
 }
 @supports (-webkit-touch-callout:none){
-  .weekhead{top:calc(63px + env(safe-area-inset-top))}
+  .weekhead{top:calc(63px + env(safe-area-inset-top));transition:top .22s ease}
+  body.header-collapsed .weekhead{top:0}
 }
 </style>
 </head>
@@ -338,10 +382,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
         <h1 id="appHeaderTitle">Cancun 9-Week Fitness</h1>
         <div id="appHeaderSubtitle">August 7 – October 8, 2026 • Cancun October 11</div>
       </div>
-      <select id="profileSelect" aria-label="Profile">
-        <option value="Scott">Scott</option>
-        <option value="Robyn">Robyn</option>
-      </select>
+      <select id="profileSelect" aria-label="Profile"></select>
     </div>
   </header>
 
@@ -603,7 +644,7 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
 
       <div class="card">
         <h2>Plan Setup</h2>
-        <p>These settings control the app title, 9-week calendar, goal, and profile-specific workout days. The start date controls when the 63-day plan begins; workouts then land on the weekdays selected below.</p>
+        <p>These settings control the app title, 9-week calendar, and goal. Profile targets and workout days are managed separately below.</p>
         <div class="fieldgrid">
           <label>Plan Title
             <input id="settingPlanTitle" type="text" placeholder="Cancun 9-Week Fitness">
@@ -619,27 +660,114 @@ hr{border:0;border-top:1px solid var(--line);margin:12px 0}
           </label>
         </div>
 
-        <hr>
-        <h3 style="margin-top:0">Workout Days</h3>
-        <p class="small">Workout days are saved separately for each profile. The exercise order follows the selected days from earliest to latest in the week.</p>
-
-        <div class="card" style="margin:8px 0;background:var(--card2);box-shadow:none">
-          <h4>Scott • 4 days/week</h4>
-          <div id="scottWorkoutDays" class="checks"></div>
-        </div>
-
-        <div class="card" style="margin:8px 0;background:var(--card2);box-shadow:none">
-          <h4>Robyn • 3 days/week</h4>
-          <div id="robynWorkoutDays" class="checks"></div>
-        </div>
-
         <button class="btn" style="margin-top:12px" onclick="savePlanSettings()">Save Plan Settings</button>
         <button class="btn secondary" style="margin-top:12px;margin-left:5px" onclick="resetPlanSettings()">Restore Cancun Defaults</button>
       </div>
 
       <div class="card">
+        <h2>Profiles & Targets</h2>
+        <p>Edit each person's targets and workout schedule. Every profile keeps separate workouts, check-ins, progress data, and photos on this device.</p>
+
+        <label style="display:block">Edit Profile
+          <select id="settingProfileSelect" style="width:100%" onchange="loadProfileSettingsEditor()"></select>
+        </label>
+
+        <div class="fieldgrid" style="margin-top:10px">
+          <label>Profile Name
+            <input id="settingProfileName" type="text" placeholder="Name">
+          </label>
+          <label>Workout Plan
+            <select id="settingProfileTemplate">
+              <option value="fourDay">4-Day Upper / Lower / Full</option>
+              <option value="threeDay">3-Day Full Body</option>
+            </select>
+          </label>
+          <label>Calories Target
+            <input id="settingTargetCalories" type="text" placeholder="2,200–2,300/day">
+          </label>
+          <label>Protein Target
+            <input id="settingTargetProtein" type="text" placeholder="200–220 g/day">
+          </label>
+          <label>Water Target
+            <input id="settingTargetWater" type="text" placeholder="3–4 L/day">
+          </label>
+          <label>Steps Display Target
+            <input id="settingTargetSteps" type="text" placeholder="8,000–10,000/day">
+          </label>
+          <label>Minimum Step Goal
+            <input id="settingTargetStepMin" type="number" inputmode="numeric" step="100" placeholder="8000">
+          </label>
+        </div>
+
+        <h3 style="margin-top:14px">Workout Days</h3>
+        <p id="workoutDayHelp" class="small"></p>
+        <div id="profileWorkoutDays" class="checks"></div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="saveProfileSettings()">Save Profile Settings</button>
+          <button class="btn red" onclick="removeSelectedProfile()">Remove Profile</button>
+        </div>
+
+        <hr>
+        <h3>Add Profile</h3>
+        <div class="fieldgrid">
+          <label>Name
+            <input id="newProfileName" type="text" placeholder="New profile">
+          </label>
+          <label>Starting Workout Plan
+            <select id="newProfileTemplate">
+              <option value="threeDay">3-Day Full Body</option>
+              <option value="fourDay">4-Day Upper / Lower / Full</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn secondary" style="margin-top:10px" onclick="addNewProfile()">Add Profile</button>
+      </div>
+
+      <div class="card">
+        <h2>App PIN Lock</h2>
+        <p>Optional 4-digit PIN for an extra layer of privacy when opening this app. Your iPhone lock and Face ID/Touch ID remain the primary device security.</p>
+
+        <div id="pinStatusBox" class="pinSettingBox"></div>
+
+        <label style="display:block;margin-top:12px">Require PIN Again After
+          <select id="pinTimeoutSelect" style="width:100%" onchange="savePinTimeoutSetting()">
+            <option value="0">Every time app is reopened</option>
+            <option value="15">15 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="240">4 hours</option>
+            <option value="480">8 hours</option>
+            <option value="720">12 hours</option>
+            <option value="1440">24 hours</option>
+          </select>
+        </label>
+
+        <div class="row" style="margin-top:12px">
+          <button id="setupPinBtn" class="btn" onclick="beginPinSetup()">Set / Change PIN</button>
+          <button id="disablePinBtn" class="btn red" onclick="disablePinLock()">Disable PIN</button>
+          <button id="lockNowBtn" class="btn secondary" onclick="lockAppNow()">Lock Now</button>
+        </div>
+
+        <div id="pinSetupArea" class="pinSettingBox" style="display:none">
+          <h3 id="pinSetupTitle">Set PIN</h3>
+          <div class="fieldgrid">
+            <label>New 4-Digit PIN
+              <input id="newPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+            </label>
+            <label>Confirm PIN
+              <input id="confirmPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+            </label>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn green" onclick="saveNewPin()">Save PIN</button>
+            <button class="btn secondary" onclick="cancelPinSetup()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
         <h2>Storage & Backup</h2>
-        <p>Workout logs, end-of-day check-ins and preferences are stored only in this browser. Photos are stored only in this browser's IndexedDB database. There is no Firebase code or network sync in this file.</p>
+        <p>Workout logs, check-ins, profile settings, and preferences are stored only in this browser. Photos are stored only in this browser's IndexedDB database. There is no Firebase code or network sync in this file.</p>
         <button class="btn" onclick="exportProfileData()">Export Workout Data</button>
         <label class="btn secondary" style="display:inline-block;margin-left:5px">
           Import Workout Data
@@ -680,32 +808,15 @@ const DEFAULT_PLAN_SETTINGS = {
   title:'Cancun 9-Week Fitness',
   startDate:'2026-08-07',
   goalName:'Cancun',
-  goalDate:'2026-10-11',
-  workoutDays:{
-    Scott:[2,3,4,6],
-    Robyn:[1,3,5]
-  }
+  goalDate:'2026-10-11'
 };
 
 function getPlanSettings(){
   try{
     const saved=JSON.parse(localStorage.getItem('cancunFitnessPlanSettings'))||{};
-    return {
-      ...DEFAULT_PLAN_SETTINGS,
-      ...saved,
-      workoutDays:{
-        Scott:Array.isArray(saved.workoutDays?.Scott) ? saved.workoutDays.Scott : [...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
-        Robyn:Array.isArray(saved.workoutDays?.Robyn) ? saved.workoutDays.Robyn : [...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
-      }
-    };
+    return {...DEFAULT_PLAN_SETTINGS,...saved};
   }catch(e){
-    return {
-      ...DEFAULT_PLAN_SETTINGS,
-      workoutDays:{
-        Scott:[...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
-        Robyn:[...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
-      }
-    };
+    return {...DEFAULT_PLAN_SETTINGS};
   }
 }
 function savePlanSettingsObject(settings){
@@ -715,28 +826,90 @@ function getPlanStart(){
   const s=getPlanSettings();
   return new Date(s.startDate+'T12:00:00');
 }
-let profile = localStorage.getItem('cancunFitnessProfile') || 'Scott';
+const DEFAULT_PROFILES = [
+  {
+    id:'Scott',
+    name:'Scott',
+    template:'fourDay',
+    workoutDays:[2,3,4,6],
+    targets:{
+      calories:'2,200–2,300/day',
+      protein:'200–220 g/day',
+      water:'3–4 L/day',
+      steps:'8,000–10,000/day',
+      stepGoalMin:8000
+    },
+    advice:'Continue steady fat loss while protecting muscle. Use protein, lifting and consistent calories rather than aggressive under-eating.'
+  },
+  {
+    id:'Robyn',
+    name:'Robyn',
+    template:'threeDay',
+    workoutDays:[1,3,5],
+    targets:{
+      calories:'1,700–1,850/day',
+      protein:'140–160 g/day',
+      water:'80–100 oz/day',
+      steps:'7,500–9,000/day',
+      stepGoalMin:7500
+    },
+    advice:'Use a two-week trend before cutting calories further. Waist measurements, photos, strength, and weekly average weight can show progress even when scale loss is slower.'
+  }
+];
+
+function cloneDefaultProfiles(){
+  return DEFAULT_PROFILES.map(p=>({
+    ...p,
+    workoutDays:[...p.workoutDays],
+    targets:{...p.targets}
+  }));
+}
+function getProfiles(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('cancunFitnessProfilesV1'));
+    if(Array.isArray(saved) && saved.length) return saved;
+  }catch(e){}
+
+  // First-run migration from older versions that stored Scott/Robyn workout
+  // days inside the global plan settings.
+  let profiles=cloneDefaultProfiles();
+  try{
+    const legacy=JSON.parse(localStorage.getItem('cancunFitnessPlanSettings'))||{};
+    if(Array.isArray(legacy.workoutDays?.Scott)) profiles[0].workoutDays=legacy.workoutDays.Scott.map(Number);
+    if(Array.isArray(legacy.workoutDays?.Robyn)) profiles[1].workoutDays=legacy.workoutDays.Robyn.map(Number);
+  }catch(e){}
+
+  saveProfiles(profiles);
+  return profiles;
+}
+function saveProfiles(profiles){
+  localStorage.setItem('cancunFitnessProfilesV1',JSON.stringify(profiles));
+}
+function getProfileById(id){
+  return getProfiles().find(p=>p.id===id) || null;
+}
+function currentProfileDef(){
+  return getProfileById(profile) || getProfiles()[0];
+}
+function profileDisplayName(id=profile){
+  return getProfileById(id)?.name || id;
+}
+function ensureActiveProfile(){
+  const profiles=getProfiles();
+  let saved=localStorage.getItem('cancunFitnessProfile') || 'Scott';
+  if(!profiles.some(p=>p.id===saved)) saved=profiles[0].id;
+  localStorage.setItem('cancunFitnessProfile',saved);
+  return saved;
+}
+function newProfileId(){
+  return 'profile_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+}
+
+let profile = ensureActiveProfile();
 let activeWorkout = null;
 let workoutElapsed = 0;
 let workoutTimerHandle = null;
 let restTimerHandle = null;
-
-const targets = {
-  Scott:{
-    calories:'2,200–2,300/day',
-    protein:'200–220 g/day',
-    water:'3–4 L/day',
-    steps:'8,000–10,000/day',
-    advice:'Continue steady fat loss while protecting muscle. Use protein, lifting and consistent calories rather than aggressive under-eating on tirzepatide.'
-  },
-  Robyn:{
-    calories:'1,700–1,850/day',
-    protein:'140–160 g/day',
-    water:'80–100 oz/day',
-    steps:'7,500–9,000/day',
-    advice:'Use a two-week trend before cutting calories further. With lifting and positive TRT response, waist measurements, photos and strength may improve even when scale loss is slower.'
-  }
-};
 
 const workouts = {
   Scott:{
@@ -820,20 +993,15 @@ function scheduledWorkout(person,d){
   const offset=Math.floor((d-start)/86400000);
   if(offset<0 || offset>=PLAN_DAYS) return null;
 
-  const settings=getPlanSettings();
-  const selected=(settings.workoutDays?.[person] || DEFAULT_PLAN_SETTINGS.workoutDays[person] || [])
-    .map(Number)
-    .sort((a,b)=>a-b);
+  const def=getProfileById(person);
+  if(!def) return null;
 
+  const selected=(def.workoutDays||[]).map(Number).sort((a,b)=>a-b);
   const weekday=d.getDay();
   const slot=selected.indexOf(weekday);
   if(slot===-1) return null;
 
-  // Exercise order follows the selected workout days from earliest to latest
-  // in the calendar week. This keeps the default schedule:
-  // Scott Tue Upper A, Wed Lower, Thu Upper B, Sat Full Body.
-  // Robyn Mon Full Body A, Wed Full Body B, Fri Full Body C.
-  if(person==='Scott'){
+  if(def.template==='fourDay'){
     const sequence=[
       {name:'Upper A',template:workouts.Scott.upperA},
       {name:'Lower',template:workouts.Scott.lower},
@@ -901,31 +1069,83 @@ const WEEKDAY_OPTIONS=[
   {value:6,label:'Sat'}
 ];
 
-function renderWorkoutDaySelectors(){
-  const settings=getPlanSettings();
-  renderWorkoutDaySelector('scottWorkoutDays','Scott',4,settings.workoutDays.Scott);
-  renderWorkoutDaySelector('robynWorkoutDays','Robyn',3,settings.workoutDays.Robyn);
+function templateDayCount(template){
+  return template==='fourDay' ? 4 : 3;
 }
-function renderWorkoutDaySelector(containerId,person,requiredCount,selectedDays){
-  const box=document.getElementById(containerId);
+function defaultDaysForTemplate(template){
+  return template==='fourDay' ? [2,3,4,6] : [1,3,5];
+}
+function renderTopProfileSelect(){
+  const select=document.getElementById('profileSelect');
+  if(!select) return;
+  const profiles=getProfiles();
+  if(!profiles.some(p=>p.id===profile)){
+    profile=profiles[0].id;
+    localStorage.setItem('cancunFitnessProfile',profile);
+  }
+  select.innerHTML='';
+  profiles.forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p.id;o.textContent=p.name;
+    select.appendChild(o);
+  });
+  select.value=profile;
+}
+function renderSettingsProfileSelect(preferredId){
+  const select=document.getElementById('settingProfileSelect');
+  if(!select) return;
+  const profiles=getProfiles();
+  const chosen=profiles.some(p=>p.id===preferredId) ? preferredId :
+    (profiles.some(p=>p.id===select.value) ? select.value : profile);
+  select.innerHTML='';
+  profiles.forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p.id;o.textContent=p.name;
+    select.appendChild(o);
+  });
+  select.value=chosen;
+}
+function renderProfileWorkoutDays(selectedDays,template){
+  const box=document.getElementById('profileWorkoutDays');
+  const help=document.getElementById('workoutDayHelp');
   if(!box) return;
+  const required=templateDayCount(template);
+  if(help) help.textContent=`Select exactly ${required} workout days for this profile. Workouts follow the selected weekdays from earliest to latest.`;
   box.innerHTML='';
   WEEKDAY_OPTIONS.forEach(day=>{
     const label=document.createElement('label');
     label.style.minWidth='64px';
-    label.innerHTML=`<input type="checkbox" data-workout-person="${person}" value="${day.value}" ${selectedDays.includes(day.value)?'checked':''}> ${day.label}`;
+    label.innerHTML=`<input type="checkbox" data-profile-workout-day value="${day.value}" ${selectedDays.includes(day.value)?'checked':''}> ${day.label}`;
     box.appendChild(label);
   });
 }
-function readWorkoutDays(person,requiredCount){
-  const values=[...document.querySelectorAll(`input[data-workout-person="${person}"]:checked`)]
-    .map(x=>Number(x.value))
-    .sort((a,b)=>a-b);
-  if(values.length!==requiredCount){
-    alert(`${person} must have exactly ${requiredCount} workout days selected.`);
+function readProfileWorkoutDays(template){
+  const required=templateDayCount(template);
+  const values=[...document.querySelectorAll('input[data-profile-workout-day]:checked')]
+    .map(x=>Number(x.value)).sort((a,b)=>a-b);
+  if(values.length!==required){
+    alert(`Select exactly ${required} workout days for this workout plan.`);
     return null;
   }
   return values;
+}
+function loadProfileSettingsEditor(){
+  const id=document.getElementById('settingProfileSelect')?.value || profile;
+  const def=getProfileById(id);
+  if(!def) return;
+
+  settingProfileName.value=def.name||'';
+  settingProfileTemplate.value=def.template||'threeDay';
+  settingTargetCalories.value=def.targets?.calories||'';
+  settingTargetProtein.value=def.targets?.protein||'';
+  settingTargetWater.value=def.targets?.water||'';
+  settingTargetSteps.value=def.targets?.steps||'';
+  settingTargetStepMin.value=def.targets?.stepGoalMin||'';
+  renderProfileWorkoutDays(def.workoutDays||defaultDaysForTemplate(def.template),def.template);
+}
+function populateProfileSettings(){
+  renderSettingsProfileSelect(profile);
+  loadProfileSettingsEditor();
 }
 
 function populatePlanSettingsForm(){
@@ -938,43 +1158,27 @@ function populatePlanSettingsForm(){
   if(b) b.value=s.startDate||'';
   if(c) c.value=s.goalName||'';
   if(d) d.value=s.goalDate||'';
-  renderWorkoutDaySelectors();
 }
 function savePlanSettings(){
   const start=settingStartDate.value;
   if(!start) return alert('Choose a start date.');
 
-  const scottDays=readWorkoutDays('Scott',4);
-  if(!scottDays) return;
-  const robynDays=readWorkoutDays('Robyn',3);
-  if(!robynDays) return;
-
   const settings={
     title:settingPlanTitle.value.trim() || DEFAULT_PLAN_SETTINGS.title,
     startDate:start,
     goalName:settingGoalName.value.trim() || 'Goal',
-    goalDate:settingGoalDate.value || '',
-    workoutDays:{
-      Scott:scottDays,
-      Robyn:robynDays
-    }
+    goalDate:settingGoalDate.value || ''
   };
   savePlanSettingsObject(settings);
   applyPlanSettingsToUI();
   renderHome();
   renderPlan();
   renderSettings();
-  alert('Plan settings saved. The 9-week schedule has been updated.');
+  alert('Plan settings saved.');
 }
 function resetPlanSettings(){
   if(!confirm('Restore the original Cancun plan title and dates?')) return;
-  savePlanSettingsObject({
-    ...DEFAULT_PLAN_SETTINGS,
-    workoutDays:{
-      Scott:[...DEFAULT_PLAN_SETTINGS.workoutDays.Scott],
-      Robyn:[...DEFAULT_PLAN_SETTINGS.workoutDays.Robyn]
-    }
-  });
+  savePlanSettingsObject({...DEFAULT_PLAN_SETTINGS});
   populatePlanSettingsForm();
   applyPlanSettingsToUI();
   renderHome();
@@ -982,6 +1186,120 @@ function resetPlanSettings(){
   renderSettings();
 }
 
+function saveProfileSettings(){
+  const id=settingProfileSelect.value;
+  const profiles=getProfiles();
+  const idx=profiles.findIndex(p=>p.id===id);
+  if(idx===-1) return;
+
+  const name=settingProfileName.value.trim();
+  if(!name) return alert('Enter a profile name.');
+
+  const template=settingProfileTemplate.value;
+  const days=readProfileWorkoutDays(template);
+  if(!days) return;
+
+  profiles[idx]={
+    ...profiles[idx],
+    name,
+    template,
+    workoutDays:days,
+    targets:{
+      calories:settingTargetCalories.value.trim() || 'Not set',
+      protein:settingTargetProtein.value.trim() || 'Not set',
+      water:settingTargetWater.value.trim() || 'Not set',
+      steps:settingTargetSteps.value.trim() || 'Not set',
+      stepGoalMin:Number(settingTargetStepMin.value)||0
+    }
+  };
+  saveProfiles(profiles);
+  renderTopProfileSelect();
+  renderSettingsProfileSelect(id);
+  loadProfileSettingsEditor();
+  renderHome();
+  renderPlan();
+  renderProgress();
+  alert('Profile settings saved.');
+}
+
+async function addNewProfile(){
+  const name=newProfileName.value.trim();
+  if(!name) return alert('Enter a name for the new profile.');
+
+  const template=newProfileTemplate.value;
+  const profiles=getProfiles();
+  if(profiles.some(p=>p.name.toLowerCase()===name.toLowerCase())){
+    return alert('A profile with that name already exists.');
+  }
+
+  const id=newProfileId();
+  const isFour=template==='fourDay';
+  profiles.push({
+    id,
+    name,
+    template,
+    workoutDays:defaultDaysForTemplate(template),
+    targets:{
+      calories:'Not set',
+      protein:'Not set',
+      water:'Not set',
+      steps:isFour?'8,000/day':'7,500/day',
+      stepGoalMin:isFour?8000:7500
+    },
+    advice:'Use consistent workouts, nutrition, daily movement, and trend data to judge progress.'
+  });
+  saveProfiles(profiles);
+  newProfileName.value='';
+  renderTopProfileSelect();
+  renderSettingsProfileSelect(id);
+  loadProfileSettingsEditor();
+  alert(`${name} was added. Set targets and workout days, then save the profile.`);
+}
+
+async function deletePhotosForProfile(profileId){
+  try{
+    const db=await photoDb();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction('photos','readwrite');
+      const store=tx.objectStore('photos');
+      const req=store.getAll();
+      req.onsuccess=()=>{
+        req.result.filter(x=>x.profile===profileId).forEach(x=>store.delete(x.id));
+      };
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+    });
+  }catch(e){}
+}
+
+async function removeSelectedProfile(){
+  const id=settingProfileSelect.value;
+  const profiles=getProfiles();
+  if(profiles.length<=1) return alert('The app must keep at least one profile.');
+
+  const def=profiles.find(p=>p.id===id);
+  if(!def) return;
+  if(!confirm(`Remove ${def.name}? This will permanently delete that profile's workout/check-in data and locally stored progress photos from this app.`)) return;
+
+  const remaining=profiles.filter(p=>p.id!==id);
+  saveProfiles(remaining);
+  localStorage.removeItem('cancunFitnessData_'+id);
+  await deletePhotosForProfile(id);
+
+  if(profile===id){
+    profile=remaining[0].id;
+    localStorage.setItem('cancunFitnessProfile',profile);
+  }
+
+  activeWorkout=null;
+  renderTopProfileSelect();
+  renderSettingsProfileSelect(profile);
+  loadProfileSettingsEditor();
+  renderHome();
+  renderPlan();
+  await renderProgress();
+  alert(`${def.name} was removed.`);
+}
 function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(v=>v.classList.remove('active'));
@@ -998,7 +1316,7 @@ function renderHome(){
   const now = new Date();
   const d = loadData();
   const ps=getPlanSettings();
-  document.getElementById('homeName').textContent = profile + ' — Today';
+  document.getElementById('homeName').textContent = profileDisplayName() + ' — Today';
   document.getElementById('homeDate').textContent =
     `${niceDate(now)} • ${ps.goalName || 'Goal'}${ps.goalDate ? ' '+formatLongDate(ps.goalDate) : ''}`;
   document.getElementById('dailyDate').value = isoDate(now);
@@ -1025,13 +1343,14 @@ function renderHome(){
   const pct = Math.round((done/totalScheduled())*100)||0;
   document.getElementById('planPercent').textContent = pct+'%';
 
-  const t=targets[profile];
+  const def=currentProfileDef();
+  const t=def.targets||{};
   document.getElementById('nutritionTargets').innerHTML =
-    `<span class="pill">Calories ${t.calories}</span>
-     <span class="pill">Protein ${t.protein}</span>
-     <span class="pill">Water ${t.water}</span>
-     <span class="pill">Steps ${t.steps}</span>
-     <p>${t.advice}</p>`;
+    `<span class="pill">Calories ${t.calories||'Not set'}</span>
+     <span class="pill">Protein ${t.protein||'Not set'}</span>
+     <span class="pill">Water ${t.water||'Not set'}</span>
+     <span class="pill">Steps ${t.steps||'Not set'}</span>
+     <p>${def.advice||'Use consistent workouts, nutrition, daily movement, and trend data to judge progress.'}</p>`;
 
   const todayDate=document.getElementById('dailyDate').value;
   loadMorningForDate(todayDate);
@@ -1420,7 +1739,7 @@ function renderLineChart(containerId,points,formatter){
     </svg>`;
 }
 function getStepGoalMinimum(){
-  return profile==='Scott' ? 8000 : 7500;
+  return Number(currentProfileDef()?.targets?.stepGoalMin)||0;
 }
 function workoutRecords(){
   return Object.values(loadData().workouts||{})
@@ -1465,7 +1784,7 @@ function scheduledThroughToday(){
   return count;
 }
 async function renderProgress(){
-  progressProfileBadge.textContent=profile;
+  progressProfileBadge.textContent=profileDisplayName();
 
   const weights=numericEntries('weight');
   const waists=numericEntries('waist');
@@ -1705,15 +2024,16 @@ function closePhotoModal(){photoModal.classList.remove('show')}
 
 function exportProfileData(){
   const payload={
-    app:'Cancun 9-Week Fitness',
+    app:getPlanSettings().title || 'Fitness Plan',
     profile,
+    profileName:profileDisplayName(),
     exportedAt:new Date().toISOString(),
     data:loadData()
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download=`CancunFitness_${profile}_Backup.json`;a.click();
+  a.href=url;a.download=`Fitness_${profileDisplayName().replace(/[^a-z0-9_-]+/gi,'_')}_Backup.json`;a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function importProfileData(event){
@@ -1722,20 +2042,22 @@ async function importProfileData(event){
     const parsed=JSON.parse(await file.text());
     if(!parsed.data) throw new Error('Invalid backup');
     saveData(parsed.data);
-    alert('Workout data imported for '+profile+'.');
+    alert('Workout data imported for '+profileDisplayName()+'.');
     renderHome();
   }catch(e){alert('Could not import this file.')}
   event.target.value='';
 }
 function resetCurrentProfile(){
-  if(confirm(`Delete all ${profile} workout and check-in data from this browser? Photos are not deleted by this button.`)){
-    localStorage.removeItem(storageKey());renderHome();alert('Profile workout data reset.');
+  const name=profileDisplayName();
+  if(confirm(`Delete all ${name} workout and check-in data from this browser? Photos are not deleted by this button.`)){
+    localStorage.removeItem(storageKey());renderHome();renderPlan();renderProgress();alert(`${name} workout data reset.`);
   }
 }
 function renderSettings(){
-  progressAdvice.textContent=profile==='Scott'
-    ? 'Aim to add a rep or a small amount of weight when all sets reach the top of the target range with clean form. Consistency on graveyard shifts matters more than making every workout long.'
-    : 'Prioritize consistent full-body lifting and gradual progression. Because body recomposition can hide fat loss on the scale, compare waist measurements, photos, strength and weekly average weight.';
+  const def=currentProfileDef();
+  progressAdvice.textContent=def.template==='fourDay'
+    ? 'Aim to add a rep or a small amount of weight when all sets reach the top of the target range with clean form. Compare workout volume by workout type rather than treating every session as identical.'
+    : 'Prioritize consistent full-body lifting and gradual progression. Because body recomposition can hide fat loss on the scale, compare waist measurements, photos, strength, and weekly average weight.';
 
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const status=document.getElementById('installStatus');
@@ -1745,10 +2067,13 @@ function renderSettings(){
       : '<b>Browser mode detected.</b> Add this page to the iPhone Home Screen for the cleaner app-style layout.';
   }
   populatePlanSettingsForm();
+  populateProfileSettings();
+  renderPinSettings();
   applyPlanSettingsToUI();
 }
 
-profileSelect.value=profile;
+renderTopProfileSelect();
+
 profileSelect.addEventListener('change',async e=>{
   profile=e.target.value;
   localStorage.setItem('cancunFitnessProfile',profile);
@@ -1758,10 +2083,274 @@ profileSelect.addEventListener('change',async e=>{
   await renderProgress();
 });
 
+settingProfileTemplate.addEventListener('change',()=>{
+  const template=settingProfileTemplate.value;
+  const currentlySelected=[...document.querySelectorAll('input[data-profile-workout-day]:checked')].map(x=>Number(x.value));
+  const required=templateDayCount(template);
+  const useDays=currentlySelected.length===required ? currentlySelected : defaultDaysForTemplate(template);
+  renderProfileWorkoutDays(useDays,template);
+});
+
+
+
+// -------------------- Optional local PIN lock --------------------
+const PIN_SETTINGS_KEY='fitnessAppPinSettingsV1';
+const PIN_LAST_UNLOCK_KEY='fitnessAppPinLastUnlockV1';
+
+function getPinSettings(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(PIN_SETTINGS_KEY))||{};
+    return {
+      enabled:!!saved.enabled,
+      hash:saved.hash||'',
+      salt:saved.salt||'',
+      timeoutMinutes:Number.isFinite(Number(saved.timeoutMinutes)) ? Number(saved.timeoutMinutes) : 240
+    };
+  }catch(e){
+    return {enabled:false,hash:'',salt:'',timeoutMinutes:240};
+  }
+}
+function savePinSettingsObject(settings){
+  localStorage.setItem(PIN_SETTINGS_KEY,JSON.stringify(settings));
+}
+function randomSalt(){
+  const bytes=new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function hashPin(pin,salt){
+  const bytes=new TextEncoder().encode(salt+':'+pin);
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+}
+function validFourDigitPin(pin){
+  return /^\d{4}$/.test(pin);
+}
+function timeoutLabel(minutes){
+  const m=Number(minutes);
+  if(m===0) return 'every app reopen';
+  if(m<60) return `${m} minutes`;
+  if(m===60) return '1 hour';
+  if(m%60===0) return `${m/60} hours`;
+  return `${m} minutes`;
+}
+function renderPinSettings(){
+  const s=getPinSettings();
+  const box=document.getElementById('pinStatusBox');
+  const timeout=document.getElementById('pinTimeoutSelect');
+  const disable=document.getElementById('disablePinBtn');
+  const lockNow=document.getElementById('lockNowBtn');
+
+  if(timeout) timeout.value=String(s.timeoutMinutes);
+  if(box){
+    box.innerHTML=s.enabled
+      ? `<b>PIN Lock: On</b><div class="small muted" style="margin-top:4px">The app will ask for the PIN ${timeoutLabel(s.timeoutMinutes)} after the last successful unlock.</div>`
+      : '<b>PIN Lock: Off</b><div class="small muted" style="margin-top:4px">No app PIN is currently required.</div>';
+  }
+  if(disable) disable.style.display=s.enabled?'inline-flex':'none';
+  if(lockNow) lockNow.style.display=s.enabled?'inline-flex':'none';
+}
+function beginPinSetup(){
+  const area=document.getElementById('pinSetupArea');
+  const title=document.getElementById('pinSetupTitle');
+  const s=getPinSettings();
+  if(area) area.style.display='block';
+  if(title) title.textContent=s.enabled?'Change PIN':'Set PIN';
+  newPinInput.value='';
+  confirmPinInput.value='';
+  setTimeout(()=>newPinInput.focus(),100);
+}
+function cancelPinSetup(){
+  pinSetupArea.style.display='none';
+  newPinInput.value='';
+  confirmPinInput.value='';
+}
+async function saveNewPin(){
+  const pin=newPinInput.value.trim();
+  const confirm=confirmPinInput.value.trim();
+  if(!validFourDigitPin(pin)) return alert('PIN must be exactly 4 digits.');
+  if(pin!==confirm) return alert('The PIN entries do not match.');
+
+  const existing=getPinSettings();
+  const salt=randomSalt();
+  const hash=await hashPin(pin,salt);
+  savePinSettingsObject({
+    enabled:true,
+    hash,
+    salt,
+    timeoutMinutes:existing.timeoutMinutes
+  });
+  localStorage.setItem(PIN_LAST_UNLOCK_KEY,String(Date.now()));
+  cancelPinSetup();
+  renderPinSettings();
+  alert('PIN lock enabled.');
+}
+async function verifyPin(pin){
+  const s=getPinSettings();
+  if(!s.enabled || !s.hash || !s.salt) return false;
+  const candidate=await hashPin(pin,s.salt);
+  return candidate===s.hash;
+}
+async function disablePinLock(){
+  const s=getPinSettings();
+  if(!s.enabled) return;
+  const current=prompt('Enter the current 4-digit PIN to disable the app lock:');
+  if(current===null) return;
+  if(!await verifyPin(current.trim())) return alert('Incorrect PIN.');
+
+  savePinSettingsObject({
+    enabled:false,
+    hash:'',
+    salt:'',
+    timeoutMinutes:s.timeoutMinutes
+  });
+  localStorage.removeItem(PIN_LAST_UNLOCK_KEY);
+  renderPinSettings();
+  hidePinOverlay();
+  alert('PIN lock disabled.');
+}
+function savePinTimeoutSetting(){
+  const s=getPinSettings();
+  s.timeoutMinutes=Number(pinTimeoutSelect.value)||0;
+  savePinSettingsObject(s);
+  renderPinSettings();
+}
+function shouldRequirePin(){
+  const s=getPinSettings();
+  if(!s.enabled) return false;
+
+  const last=Number(localStorage.getItem(PIN_LAST_UNLOCK_KEY))||0;
+  if(s.timeoutMinutes===0){
+    // "Every app reopen" is implemented as no persistent grace period.
+    // The current live session remains usable until it is backgrounded/reopened.
+    return !window.__fitnessPinUnlockedThisSession;
+  }
+  const elapsed=Date.now()-last;
+  return !last || elapsed >= s.timeoutMinutes*60*1000;
+}
+function showPinOverlay(){
+  const overlay=document.getElementById('pinLockOverlay');
+  if(!overlay) return;
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  pinUnlockInput.value='';
+  pinUnlockError.textContent='';
+  setTimeout(()=>pinUnlockInput.focus(),150);
+}
+function hidePinOverlay(){
+  const overlay=document.getElementById('pinLockOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+async function attemptPinUnlock(){
+  const pin=pinUnlockInput.value.trim();
+  if(!validFourDigitPin(pin)){
+    pinUnlockError.textContent='Enter all 4 digits.';
+    return;
+  }
+  if(await verifyPin(pin)){
+    window.__fitnessPinUnlockedThisSession=true;
+    localStorage.setItem(PIN_LAST_UNLOCK_KEY,String(Date.now()));
+    hidePinOverlay();
+    pinUnlockError.textContent='';
+  }else{
+    pinUnlockInput.value='';
+    pinUnlockError.textContent='Incorrect PIN.';
+    navigator.vibrate?.([120,80,120]);
+    setTimeout(()=>pinUnlockInput.focus(),80);
+  }
+}
+function lockAppNow(){
+  if(!getPinSettings().enabled) return;
+  window.__fitnessPinUnlockedThisSession=false;
+  localStorage.removeItem(PIN_LAST_UNLOCK_KEY);
+  showPinOverlay();
+}
+function checkPinLock(){
+  if(shouldRequirePin()) showPinOverlay();
+  else hidePinOverlay();
+}
+
+// Allow keyboard submission from the unlock field.
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && document.getElementById('pinLockOverlay')?.classList.contains('show')){
+    attemptPinUnlock();
+  }
+});
+
+// Re-check when returning from the background. This respects the chosen grace period.
+let pinBackgroundedAt=0;
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){
+    pinBackgroundedAt=Date.now();
+    if(getPinSettings().timeoutMinutes===0){
+      window.__fitnessPinUnlockedThisSession=false;
+    }
+  }else if(document.visibilityState==='visible'){
+    checkPinLock();
+  }
+});
+
+window.addEventListener('pageshow',()=>{
+  checkPinLock();
+});
+
+// Auto-hide header on downward scroll and reveal it immediately on upward scroll.
+let lastScrollY=window.scrollY;
+let headerHidden=false;
+let headerTicking=false;
+const topHeader=document.querySelector('.top');
+
+function setHeaderHidden(hidden){
+  if(!topHeader || headerHidden===hidden) return;
+  headerHidden=hidden;
+  topHeader.classList.toggle('header-hidden',hidden);
+  document.body.classList.toggle('header-collapsed',hidden);
+}
+
+function updateHeaderOnScroll(){
+  const currentY=Math.max(0,window.scrollY);
+  const delta=currentY-lastScrollY;
+
+  // Keep the header visible near the top of the page.
+  if(currentY<36){
+    setHeaderHidden(false);
+  }else if(delta>7){
+    setHeaderHidden(true);
+  }else if(delta<-3){
+    setHeaderHidden(false);
+  }
+
+  lastScrollY=currentY;
+  headerTicking=false;
+}
+
+window.addEventListener('scroll',()=>{
+  if(!headerTicking){
+    requestAnimationFrame(updateHeaderOnScroll);
+    headerTicking=true;
+  }
+},{passive:true});
+
+// When switching sections, reveal the header so navigation context is obvious.
+const originalShowView=showView;
+showView=function(name){
+  setHeaderHidden(false);
+  lastScrollY=window.scrollY;
+  originalShowView(name);
+};
+
+// Tapping near the very top of the screen also reveals it naturally on scroll-to-top.
+window.addEventListener('pageshow',()=>setHeaderHidden(false));
+
 applyPlanSettingsToUI();
 renderHome();
 renderPlan();
 renderSettings();
+checkPinLock();
 
 // Keep inputs visible when the iPhone keyboard opens.
 document.addEventListener('focusin',e=>{
@@ -1787,5 +2376,17 @@ toggleWorkoutTimer=function(){
   else if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null;}
 };
 </script>
+
+<div id="pinLockOverlay" class="pinOverlay" aria-hidden="true">
+  <div class="pinPanel">
+    <div class="pinIcon">🔒</div>
+    <h2 id="pinLockTitle">App Locked</h2>
+    <p id="pinLockSubtitle">Enter your 4-digit PIN to continue.</p>
+    <input id="pinUnlockInput" class="pinEntry" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="4 digit PIN">
+    <div id="pinUnlockError" class="pinError"></div>
+    <button class="btn" style="width:100%;margin-top:6px" onclick="attemptPinUnlock()">Unlock</button>
+  </div>
+</div>
+
 </body>
 </html>
